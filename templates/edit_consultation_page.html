@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='edit_consultation_page.css') }}">
+        <title>Teammed</title>
+    </head>
+    <body>
+            <h2>Edit consultation </h2>
+        
+            <br>
+            <br>
+         
+            <form method ="POST" action ="/change_consultation/{{c.id}}" enctype="multipart/form-data">
+
+                            <label >Weight:</label>
+                            <input type ="number"  name="weight" value = {{c.weight}}>
+
+                            <br>
+                            <br>
+
+                            <label >Diagnostic:</label>
+                            <input type ="text"  name="diagnostic" value = {{c.diagnostic}}>
+
+                            <br>
+                            <br>
+
+                            <label >Date:</label>
+                            <input type ="text"  name="date" value = {{c.consultation_date}}>
+
+                            <br>
+                            <br>
+
+                            <label >Health state:</label>
+                            <input type ="number"  name="health_state" min = 0 max = 10  value = {{c.health_state}}>
+
+                            <br>
+                            <br>
+
+                            <button type ="submit">Submit</button>
+
+            </form>
+            {% for message in get_flashed_messages() %}
+                <p>{{message}}</p>
+            {% endfor %}
+    </body>
+
+</html>

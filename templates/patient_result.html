@@ -81,10 +81,15 @@
                     {% if c.upload_file_path is not none %}
                          <a href="{{ url_for('download_attachment', consultation_id = c.id ) }}">
                             <button class ="download_button">
-                            download attachment
+                                Download Attachment
                             </button>
                         </a>
                     {% endif %}
+                    <a href ="{{ url_for('load_edit_consultation_page' , consultation_id = c.id ) }}"
+                        <button class ="edit_button">
+                            Edit
+                        </button>
+                     </a>
                 </div>
             <hr class ="between_consultations">
             {% endfor %}

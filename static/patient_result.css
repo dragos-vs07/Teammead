@@ -22,3 +22,14 @@ body{
     color: white;
     cursor: pointer;
 }
+
+.edit_button{
+    text-decoration: none;
+    background-color:rgb(169, 169, 169);
+    color: white;
+    cursor: pointer;
+    padding: 3px;
+    border-style: solid;
+    border-color:rgb(119, 119, 119);
+    border-radius: 2px;
+}
