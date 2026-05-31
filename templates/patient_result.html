@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='patient_result.css') }}">
+        <title>Teammed</title>
+    </head>
+    <body>
+        <h3> Results for patient {{first_name}} {{last_name}} : </h3>
+
+        <br>
+
+        <h4> General Information: </h4>
+
+        <p> Date of birth:  {{birth_date}} </p>
+        <p> Gender:  {{gender}} </p>
+        
+        <hr>
+
+        <h4> Contact Information : </h4>
+
+        <p> Email: {{ email }}</p>
+        <p> Phone number : {{phone_number}} </p>
+        <hr>
+
+        <h4> Consultations: </h4>
+
+        <div class ="consultation_container">
+            {% for c in consultations %}
+            
+                <div class ="consultation_box">
+                    <p> date: {{c.consultation_date}} </p>
+                    <p> weight: {{c.weight}} </p>
+                    <p> diagnostic: {{c.diagnostic}} </p>
+                    <p> health state: {{c.health_state}} </p>
+                    {% if c.upload_file_path is not none %}
+                         <a href="{{ url_for('download_attachment', consultation_id = c.id ) }}">
+                            <button class ="download_button">
+                            download attachment
+                            </button>
+                        </a>
+                    {% endif %}
+                </div>
+            <hr class ="between_consultations">
+            {% endfor %}
+        </div>
+            
+    </body>
+
+</html>

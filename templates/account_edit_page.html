@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='account_edit_page.css') }}">
+        <title>Teammed</title>
+    </head>
+
+    <body>
+
+        <h2> Edit your account authentification data</h2>
+
+        <form method="POST" action = "/submit_changes_auth" class ="changes_form">   
+                <input type="text"  name="old_password"  placeholder = "Old password"  class ="input_box">
+                <br>
+                <br>
+                <input type="text"  name="new_password"  placeholder = "New Password (optional)"  class ="input_box">
+                <br>
+                <br>
+                <input type="text"  name="new_email"  placeholder = "New Email" value = {{old_email}}  class ="input_box">
+                <br>
+                <br>
+                <button type="submit" class ="submit_changes_button">Submit changes</button>
+        </form>
+
+        <h2> Edit your profile </h2>
+
+        <form method = "POST" action ="/submit_changes_profile">
+
+                <label >Username:</label>
+                <input type ="text"  name="username" value = {{old_username}}>
+
+                <br>
+                <br>
+
+                <label >First Name:</label>
+                <input type ="text"  name="first_name" value = {{old_first_name}}>
+
+                <br>
+                <br>
+
+                <label >Last Name:</label>
+                <input type ="text"  name="last_name" value = {{old_last_name}}>
+
+                <br>
+                <br>
+
+                <label>Gender:</label>
+
+                <input
+
+                type ="radio"  
+                name="gender" 
+                value="female" 
+                {% if gender == "male" %} checked {% endif %}
+
+                >
+
+                Male
+                </label>
+
+                <label >
+
+                
+                <input
+
+                type ="radio"  
+                name="gender" 
+                value="female" 
+                {% if gender == "female" %} checked {% endif %}
+
+                >
+
+                Female
+                </label>
+
+                <br>
+                <br>
+
+                <label> Phone number: </label>
+                <input type="text"  name="phone_number" value = {{old_phone_number}}>
+
+                <br>
+                <br>
+                
+                <label>Date of birth:</label>
+                <input type ="number"  name="day"  min="0"  max="31" placeholder ="day" value = {{old_day}}>
+                <input type ="number"  name="month"  min="1"  max="12" placeholder ="month" value = {{old_month}}>
+                <input type ="number"  name="year"  min="1900"  max="2026" placeholder ="year" value = {{old_year}}>
+
+                <br>
+                <br>
+
+                <button type ="submit">Submit changes</button>
+            </form>
+            
+            {% for message in get_flashed_messages() %}
+                <p>{{message}}</p>
+            {% endfor %}
+    </body>
+
+</html>

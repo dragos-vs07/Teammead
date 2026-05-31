@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='doctor_page.css') }}">
+        <title>Teammed</title>
+    </head>
+    <body>
+            <h2>Information for doctor {{ first_name }} {{ last_name }} </h2>
+            
+        <div class = "left_side">
+
+                    <div class ="consultation_panel">
+
+                        <h3>Register consultation</h3>
+
+                        <form method ="POST" action ="/reg_consultation" enctype="multipart/form-data">
+
+                            <label >First Name:</label>
+                            <input type ="text"  name="first_name">
+
+                            <br>
+                            <br>
+
+                            <label >Last Name:</label>
+                            <input type ="text"  name="last_name">
+
+                            <br>
+                            <br>
+
+                            <label >Weight:</label>
+                            <input type ="number"  name="weight">
+
+                            <br>
+                            <br>
+
+                            <label >Diagnostic:</label>
+                            <input type ="text"  name="diagnostic">
+
+                            <br>
+                            <br>
+
+                            <label >Date:</label>
+                            <input type ="text"  name="date">
+
+                            <br>
+                            <br>
+
+                            <label >Health state:</label>
+                            <input type ="number"  name="health_state" min = 0 max = 10>
+
+                            <br>
+                            <br>
+
+                            <label> Attach Files: </label>
+                            <input type ="file" name="file">
+
+                            <br>
+                            <br>
+                            
+                            <button type ="submit">Submit</button>
+
+                        </form>
+
+                    </div>
+
+                        <br>
+                        <br>
+
+                        <h3>Find patient</h3>
+
+                        <form method ="POST" action ="/find_patient">
+                            <label >First Name:</label>
+                            <input type ="text"  name="first_name">
+                            <br>
+                            <br>
+                            <label >Last Name:</label>
+                            <input type ="text"  name="last_name">
+
+                            <button type ="submit">Submit</button>
+                        </form>
+         </div>
+         <div class ="right_side">
+            <button class="edit_button" onclick="window.location.href='/edit_account'">
+                         Edit Account
+                </button>
+         </div>
+
+            
+    </body>
+
+</html>

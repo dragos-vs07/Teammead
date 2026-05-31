@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+<html>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+    <head>
+        <title>Teammed</title>
+    </head>
+    <body>
+            <p class ="main_text"> 
+                <span class="first_half">Welcome to </span><span class="second_half">Team</span><span class="third_half">med</span>      
+            </p>
+            <p class ="aux_text">
+                Medical team collaboration platform
+            </p>
+    
+        <div class = "content">
+                    <div class ="left_side">
+
+                        <p class="second_text">Log in to Teammed</p>
+                            <form method="POST" action = "/submit_login" class ="login_form">
+                            
+                                <input type="text"  name="username"  placeholder = "Username or Email address"  class ="input_box">
+                                <br>
+                                <br>
+                                <input type="text"  name="password"  placeholder = "Password"  class ="input_box">
+                                <br>
+                                <br>
+                                <button type="submit" class ="login_button">Log in</button>
+                            </form>
+                        
+                    </div>
+                    <div class = "right_side">
+
+                        <p class="third_text">New to Teammed?</p>
+                        <p class="fourth_text">
+                            Join your medical team and start collaborating securely on patient care and workflows ,
+                            or begin monitoring your health and keeping in touch with your healthcare proffesionals 
+                            in an easy and interactive way.
+                        </p>
+
+                        <button class="register_button" onclick="window.location.href='/register'">
+                                Register
+                            </button>
+        </div>
+        </div>
+                
+            
+
+        
+        <div class ="flash_message">
+
+             {% for message in get_flashed_messages() %}
+                <p>{{message}}</p>
+            {% endfor %}
+
+            </div>
+    </body>
+
+</html>

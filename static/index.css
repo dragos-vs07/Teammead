@@ -1,0 +1,148 @@
+body{
+    background: linear-gradient( to bottom , rgb(0, 60, 106) , rgb(131, 200, 246) );
+    
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+
+    font-family: Verdana;
+}
+
+.main_text{
+    
+    text-align: center;
+    font-size: 3rem;
+    margin-top: 40px;
+}
+.aux_text{
+    color: rgb(127, 175, 234);
+    text-align: center;
+    font-size: 1rem;
+}
+.first_half{
+    color:white;
+}
+.second_half{
+    font-weight: bold;
+    color:rgb(17, 109, 190);
+    
+}
+.third_half{
+    font-weight: bold;
+    background-color:rgb(141, 159, 172);
+    border-radius: 5px;
+    color:rgb(0, 60, 100);
+    padding: 3px;
+}
+.content{
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    padding: 50px 100px;
+}
+
+.left_side{
+    background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px); /* Safari */
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 16px;
+  padding: 50px;
+}
+
+
+.right_side{
+    width: 40%;
+    
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    
+    align-items: center;
+}
+.second_text{
+    color: rgb(232, 232, 232);
+    text-align: center;
+    font-size: 2rem;
+}
+.fourth_text
+{
+    color: rgb(232, 232, 232);
+    text-align: center;
+}
+.third_text{
+    color: rgb(232, 232, 232);
+    text-align: center;
+    font-size: 2rem;
+}
+
+
+.login_form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+}
+input::placeholder {
+  color: rgb(164, 164, 164);
+}
+.input_box{
+    border-radius: 25px;
+    border-style: solid;
+    border-color: rgb(90, 90, 90);
+    border-width: 3px;
+    background-color:rgb(39, 39, 39);
+    color:rgb(196, 196, 196);
+    text-align: center;
+
+    font-size: 1.25rem;
+
+    padding: 10px;
+
+    width: 300px;
+}
+
+.login_button{
+    border-radius: 25px;
+    color:white;
+    border-width: 1px;
+    border-style:solid;
+    border-color:aliceblue;
+    font-size: 1.25rem;
+    padding: 10px 20px;
+     background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px); /* Safari */
+    cursor: pointer;
+}
+.register_button{
+
+    border-radius: 25px;
+    color:white;
+    border-style:solid;
+    border-color:aliceblue;
+    border-width: 1px;
+    text-align: center;
+     background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px); /* Safari */
+    font-size: 1.25rem;
+
+    padding: 10px 20px;
+
+    cursor: pointer;
+}
+
+.flash_message{
+    color: red;
+
+    text-align: center;
+
+    margin-top: 40px;
+
+    font-size: 1.2rem;
+}
