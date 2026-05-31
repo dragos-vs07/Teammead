@@ -158,33 +158,33 @@ def load_doctor_page():
         if "user_id" not in session:
                return redirect(url_for("load_main_page"))
         
+        session["patient_id"] = 0; # if of the patient the doctor currently looks at the page of
+
         user = DoctorInfo.query.filter_by(user_id = session["user_id"]).first()
         return render_template("doctor_page.html", first_name = user.first_name.title() , last_name = user.last_name.title())
 
 @app.route('/reg_consultation' , methods = ["POST"])
 def submit_consultation():
-       
-        first_name_form = request.form.get("first_name").lower()
-        last_name_form = request.form.get("last_name").lower()
 
         doc = DoctorInfo.query.filter_by(user_id = session["user_id"]).first()
-        pat = PatientInfo.query.filter_by(first_name = first_name_form , last_name = last_name_form ).first()
+        pat = PatientInfo.query.filter_by(user_id = session["patient_id"]).first()
+
+        first_name = pat.first_name.lower()
+        last_name = pat.last_name.lower()
 
         if pat is None :
                 flash("No patient found")
-                return redirect(url_for("load_doctor_page"))
+                return redirect(url_for("display_patient_info"))
 
-        base = fr"C:\Users\Dragos\Desktop\Teammed\uploaded_consultation_files" # base folder path
-        folder_path = fr"{base}\{first_name_form}_{last_name_form}" # patient folder path
+        file = request.files.get("file")    # file from the browser
+        file_path = None
 
-        print(folder_path)
-        os.makedirs(folder_path, exist_ok = True)   # if patient doesnt have a folder , create it
-
-        file = request.files["file"]    # file from the browser
-        file_path = fr"{folder_path}\{file.filename}" # final file path
-        print(file_path)
-
-        file.save(file_path)
+        if file and file.filename:
+                base = fr"C:\Users\Dragos\Desktop\Teammed\uploaded_consultation_files" # base folder path
+                folder_path = fr"{base}\{first_name}_{last_name}" # patient folder path
+                os.makedirs(folder_path, exist_ok = True)   # if patient doesnt have a folder , create it
+                file_path = fr"{folder_path}\{file.filename}" # final file path
+                file.save(file_path)
 
         new_consultation = ConsultationInfo(
                 weight = request.form.get("weight") ,
@@ -199,14 +199,21 @@ def submit_consultation():
         db.session.add(new_consultation)
         db.session.commit()
 
-        return redirect(url_for("load_doctor_page"))
+        return redirect(url_for("display_patient_info"))
 
-@app.route('/find_patient' , methods = ["POST"])
+@app.route('/find_patient' , methods = ["POST","GET"])
 def display_patient_info():
-        patient_first_name = request.form.get("first_name")
-        patient_last_name = request.form.get("last_name")
+        
+        if session["patient_id"] == 0:
+                patient_first_name = request.form.get("first_name")
+                patient_last_name = request.form.get("last_name")
+                query_patient = PatientInfo.query.filter_by(first_name = patient_first_name.lower() , last_name = patient_last_name.lower()).first()
+                session["patient_id"] = query_patient.user_id
+        else :
+                query_patient = PatientInfo.query.filter_by(user_id = session["patient_id"]).first()
+                patient_first_name = query_patient.first_name
+                patient_last_name = query_patient.last_name
 
-        query_patient = PatientInfo.query.filter_by(first_name = patient_first_name.lower() , last_name = patient_last_name.lower()).first()
         if query_patient is None:
                 flash("Patient doesnt exist")
                 return redirect(url_for('load_doctor_page'))

@@ -21,6 +21,51 @@
 
         <p> Email: {{ email }}</p>
         <p> Phone number : {{phone_number}} </p>
+
+        <hr>
+
+        <div class ="consultation_panel">
+
+                        <h3>Register consultation</h3>
+
+                        <form method ="POST" action ="/reg_consultation" enctype="multipart/form-data">
+
+                            <label >Weight:</label>
+                            <input type ="number"  name="weight">
+
+                            <br>
+                            <br>
+
+                            <label >Diagnostic:</label>
+                            <input type ="text"  name="diagnostic">
+
+                            <br>
+                            <br>
+
+                            <label >Date:</label>
+                            <input type ="text"  name="date">
+
+                            <br>
+                            <br>
+
+                            <label >Health state:</label>
+                            <input type ="number"  name="health_state" min = 0 max = 10>
+
+                            <br>
+                            <br>
+
+                            <label> Attach Files: </label>
+                            <input type ="file" name="file">
+
+                            <br>
+                            <br>
+                            
+                            <button type ="submit">Submit</button>
+
+                        </form>
+
+                    </div>
+        
         <hr>
 
         <h4> Consultations: </h4>
