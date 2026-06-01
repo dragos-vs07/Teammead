@@ -2,7 +2,7 @@
 
 <html>
     <head>
-        <link rel="stylesheet" href="{{ url_for('static', filename='patient_result.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='CSS/patient_result.css') }}">
         <title>Teammed</title>
     </head>
     <body>
@@ -85,7 +85,7 @@
                             </button>
                         </a>
                     {% endif %}
-                    <a href ="{{ url_for('load_edit_consultation_page' , consultation_id = c.id ) }}"
+                    <a href ="{{ url_for('load_edit_consultation_menu' , consultation_id = c.id ) }}"
                         <button class ="edit_button">
                             Edit
                         </button>
@@ -95,6 +95,21 @@
             {% endfor %}
         </div>
             
+        <div class ="charts_area">
+
+                <canvas id ="weight_chart" class ="chart">
+
+                </canvas>
+
+                <canvas id ="health_state_chart" class ="chart">
+                    
+                </canvas>
+
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+        <script> const consultations_list = {{ consultations | tojson | safe }};</script>
+        <script src="{{ url_for('static', filename='JavaScript/patient_result.js') }}"></script>
     </body>
 
 </html>

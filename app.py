@@ -85,7 +85,11 @@ def create_birth_date( day , month , year):
 def load_main_page():
         return render_template("index.html")
 
-
+@app.route('/load_edit_consultation_page/<consultation_id>')
+def load_edit_consultation_menu(consultation_id):
+        return render_template("edit_consultation_page.html",
+                               c = ConsultationInfo.query.filter_by(id = consultation_id).first()
+                               )
 @app.route('/patient_info') # loads page for a patient user
 def load_patient_page():
 
@@ -259,6 +263,10 @@ def display_patient_info():
                     last_name=patient_last_name.lower()
                 ).first()
 
+                if query_patient is None:
+                        flash("Patient doesnt exist")
+                        return redirect(url_for('load_doctor_page'))
+        
                 session["patient_id"] = query_patient.user_id
 
         else:
@@ -273,7 +281,7 @@ def display_patient_info():
                 flash("Patient doesnt exist")
                 return redirect(url_for('load_doctor_page'))
 
-        consultations = ConsultationInfo.query.filter_by(
+        consultations_data = ConsultationInfo.query.filter_by(
             patient_id=query_patient.user_id
         ).all()
 
@@ -285,10 +293,18 @@ def display_patient_info():
             gender=query_patient.gender,
             email=query_patient.email,
             phone_number=query_patient.phone_number,
-            consultations=consultations,
-            update_date=CURRENT_DATE
+            consultations=[{ # making the consultations dictionaries so we can convert them to json for the javascript part
+                "id": c.id ,
+                "weight": c.weight,
+                "diagnostic": c.diagnostic,
+                "consultation_date": c.consultation_date,
+                "health_state": c.health_state ,
+                "upload_file_path" : c.upload_file_path
+            }
+            for c in consultations_data
+            ] ,
+            update_date=CURRENT_DATE ,
         )
-
 
 @app.route('/reg_consultation' , methods=["POST"])  # adds new consultation to database
 def submit_consultation():

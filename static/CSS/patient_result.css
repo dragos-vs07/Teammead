@@ -33,3 +33,7 @@ body{
     border-color:rgb(119, 119, 119);
     border-radius: 2px;
 }
+.charts_area{
+    width : 500px;
+      height : 500px ;
+}
