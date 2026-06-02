@@ -86,7 +86,7 @@ def load_main_page():
         return render_template("index.html")
 
 @app.route('/load_edit_consultation_page/<consultation_id>')
-def load_edit_consultation_menu(consultation_id):
+def load_edit_consultation_page(consultation_id):
         return render_template("edit_consultation_page.html",
                                c = ConsultationInfo.query.filter_by(id = consultation_id).first()
                                )
@@ -339,6 +339,14 @@ def submit_consultation():
                 upload_file_path=file_path,
         )
 
+        if not new_consultation.diagnostic :
+                flash("Must confirm a diagnostic")
+                return redirect(url_for("display_patient_info"))
+        
+        if not new_consultation.consultation_date :
+                flash("Must specify the date of the consultation")
+                return redirect(url_for("display_patient_info"))
+        
         db.session.add(new_consultation)
         db.session.commit()
 
@@ -365,8 +373,7 @@ def apply_changes(consultation_id):
 
         db.session.commit()
 
-        flash("Changes applied successfully")
-        return redirect(url_for("load_edit_consultation_page", consultation_id=consultation_id))
+        return redirect(url_for("display_patient_info") )
 
 
 @app.route('/download_attachment/<int:consultation_id>')  # downloads attachement to consultation
