@@ -1,10 +1,8 @@
 from flask import Flask , render_template , request , flash , redirect , url_for , session , send_file
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime , date
 from werkzeug.security import generate_password_hash , check_password_hash
 import os
-
-CURRENT_DATE = datetime.now().strftime("%d/%m/%Y")
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
@@ -25,7 +23,7 @@ class UserAuth(db.Model):
         username = db.Column(db.String(80) , unique = True , nullable = False)
         password = db.Column(db.String(200) , nullable = False)
         email = db.Column(db.String(200) , nullable = False)
-        update_date = db.Column(db.String(20))
+        update_date = db.Column(db.Date)
 
 
 class PatientInfo(db.Model):
@@ -34,12 +32,12 @@ class PatientInfo(db.Model):
        user_id = db.Column(db.Integer, db.ForeignKey("user_auth.id"))
        first_name = db.Column(db.String(50) , nullable = False )
        last_name = db.Column(db.String(50) , nullable = False )
-       birth_date = db.Column(db.String, nullable = False)
+       birth_date = db.Column(db.Date , nullable = False)
        gender = db.Column(db.String(20), nullable = False)
        email = db.Column(db.String(100), nullable = False)
        phone_number = db.Column(db.String(20))
        home_adress = db.Column(db.String(100))
-       update_date = db.Column(db.String(20))
+       update_date = db.Column(db.Date)
 
 
 class DoctorInfo(db.Model):
@@ -48,12 +46,12 @@ class DoctorInfo(db.Model):
         user_id = db.Column(db.Integer, db.ForeignKey("user_auth.id"))
         first_name = db.Column(db.String(50) , nullable = False )
         last_name = db.Column(db.String(50) , nullable = False )
-        birth_date = db.Column(db.String(20), nullable = False)
+        birth_date = db.Column(db.Date , nullable = False)
         gender = db.Column(db.String(20), nullable = False)
         email = db.Column(db.String(100), nullable = False)
         phone_number = db.Column(db.String(20))
         workplace_adress = db.Column(db.String(100))
-        update_date = db.Column(db.String(20))
+        update_date = db.Column(db.Date)
 
 
 class ConsultationInfo(db.Model):
@@ -64,17 +62,17 @@ class ConsultationInfo(db.Model):
         weight = db.Column(db.Integer)
         diagnostic = db.Column(db.String(50) , nullable = False )
         health_state = db.Column(db.Integer)
-        consultation_date = db.Column(db.String(20) , nullable = False )
+        consultation_date = db.Column(db.Date , nullable = False )
         upload_file_path = db.Column(db.String(200))
-        update_date = db.Column(db.String(20))
+        update_date = db.Column(db.Date)
 
 
 # =========================
 # HELPERS
 # =========================
 
-def create_birth_date( day , month , year):
-        return f"{day}/{month}/{year}"
+def create_string_date( day , month , year):
+        return f"{day}-{month}-{year}"
 
 
 # =========================
@@ -165,26 +163,28 @@ def submit_register_data():
             username=username,
             password=generate_password_hash(password),
             email=email,
-            update_date=CURRENT_DATE
+            update_date=date.today()
         )
 
         db.session.add(new_user)
         db.session.commit()
+
+        StringBday = create_string_date( #birthday as a string
+            request.form.get("day"),
+            request.form.get("month"),
+            request.form.get("year")
+        )
 
         if is_doctor == "on":
                 new_doctor = DoctorInfo(
                       user_id = new_user.id,
                       first_name = request.form.get("first_name").lower(),
                       last_name = request.form.get("last_name").lower(),
-                      birth_date = create_birth_date(
-                          request.form.get("day"),
-                          request.form.get("month"),
-                          request.form.get("year")
-                      ),
+                      birth_date = datetime.strptime(StringBday,"%d-%m-%Y").date() ,
                       gender = request.form.get("gender"),
                       email = new_user.email,
                       phone_number = request.form.get("phone_number"),
-                      update_date = CURRENT_DATE
+                      update_date = date.today()
                )
                 db.session.add(new_doctor)
 
@@ -193,15 +193,11 @@ def submit_register_data():
                       user_id = new_user.id,
                       first_name = request.form.get("first_name").lower(),
                       last_name = request.form.get("last_name").lower(),
-                      birth_date = create_birth_date(
-                          request.form.get("day"),
-                          request.form.get("month"),
-                          request.form.get("year")
-                      ),
+                      birth_date = datetime.strptime(StringBday,"%d-%m-%Y").date() ,
                       gender = request.form.get("gender"),
                       email = new_user.email,
                       phone_number = request.form.get("phone_number"),
-                      update_date = CURRENT_DATE
+                      update_date = date.today()
                )
                 db.session.add(new_patient)
 
@@ -224,11 +220,11 @@ def submit_login_data():
         found_user_by_username = UserAuth.query.filter_by(username=username).first()
         found_user_by_email = UserAuth.query.filter_by(email=username).first()
 
-        if found_user_by_username is None and found_user_by_email is None:
+        if not found_user_by_username  and not found_user_by_email :
                flash("Wrong authentification data")
                return redirect(url_for("load_main_page"))
 
-        if found_user_by_username is None:
+        if not found_user_by_username :
                 found_user = found_user_by_email
         else:
                 found_user = found_user_by_username
@@ -238,6 +234,7 @@ def submit_login_data():
                 return redirect(url_for("load_main_page"))
 
         session["user_id"] = found_user.id
+        session["patient_id"] = 0
 
         if PatientInfo.query.filter_by(user_id=found_user.id).first():
                 session["role"] = "patient"
@@ -254,7 +251,7 @@ def submit_login_data():
 @app.route('/find_patient' , methods=["POST","GET"]) # displays results for a sought patient
 def display_patient_info():
 
-        if session["patient_id"] == 0:
+        if not session["patient_id"] :
                 patient_first_name = request.form.get("first_name")
                 patient_last_name = request.form.get("last_name")
 
@@ -263,10 +260,10 @@ def display_patient_info():
                     last_name=patient_last_name.lower()
                 ).first()
 
-                if query_patient is None:
+                if not query_patient :
                         flash("Patient doesnt exist")
                         return redirect(url_for('load_doctor_page'))
-        
+
                 session["patient_id"] = query_patient.user_id
 
         else:
@@ -277,7 +274,7 @@ def display_patient_info():
                 patient_first_name = query_patient.first_name
                 patient_last_name = query_patient.last_name
 
-        if query_patient is None:
+        if not query_patient :
                 flash("Patient doesnt exist")
                 return redirect(url_for('load_doctor_page'))
 
@@ -303,7 +300,7 @@ def display_patient_info():
             }
             for c in consultations_data
             ] ,
-            update_date=CURRENT_DATE ,
+            update_date=date.today() ,
         )
 
 @app.route('/reg_consultation' , methods=["POST"])  # adds new consultation to database
@@ -312,7 +309,7 @@ def submit_consultation():
         doc = DoctorInfo.query.filter_by(user_id=session["user_id"]).first()
         pat = PatientInfo.query.filter_by(user_id=session["patient_id"]).first()
 
-        if pat is None:
+        if not pat :
                 flash("No patient found")
                 return redirect(url_for("display_patient_info"))
 
@@ -329,10 +326,16 @@ def submit_consultation():
                 file_path = fr"{folder_path}\{file.filename}"
                 file.save(file_path)
 
+        ConsultationDateString = create_string_date( #birthday as a string
+            request.form.get("day"),
+            request.form.get("month"),
+            request.form.get("year")
+        )
+
         new_consultation = ConsultationInfo(
                 weight=request.form.get("weight"),
                 diagnostic=request.form.get("diagnostic"),
-                consultation_date=request.form.get("date"),
+                consultation_date=datetime.strptime(ConsultationDateString,"%d-%m-%Y").date() ,
                 doctor_id=doc.user_id,
                 patient_id=pat.user_id,
                 health_state=request.form.get("health_state"),
@@ -361,13 +364,20 @@ def apply_changes(consultation_id):
         consultation.weight = request.form.get("weight")
         consultation.diagnostic = request.form.get("diagnostic")
         consultation.health_state = request.form.get("health_state")
-        consultation.consultation_date = request.form.get("date")
 
-        if consultation.consultation_date is None:
+        ConsultationDateString = create_string_date( #birthday as a string
+            request.form.get("day"),
+            request.form.get("month"),
+            request.form.get("year")
+        )
+
+        consultation.consultation_date = datetime.strptime(ConsultationDateString,"%d-%m-%Y").date() 
+
+        if not consultation.consultation_date :
                 flash("Consultation date must be completed")
                 return redirect(url_for("load_edit_consultation_page", consultation_id=consultation_id))
 
-        if consultation.diagnostic is None:
+        if not consultation.diagnostic :
                 flash("Diagnostic must be completed")
                 return redirect(url_for("load_edit_consultation_page", consultation_id=consultation_id))
 
@@ -397,8 +407,6 @@ def load_edit_account_page(): # loads the edit account menu
         else:
                 user_entry = PatientInfo.query.filter_by(user_id=session["user_id"]).first()
 
-        birth_date_split = user_entry.birth_date.split('/')
-
         return render_template(
                  "account_edit_page.html",
                    old_email=auth_entry.email,
@@ -406,9 +414,9 @@ def load_edit_account_page(): # loads the edit account menu
                    old_first_name=user_entry.first_name.title(),
                    old_last_name=user_entry.last_name.title(),
                    old_phone_number=user_entry.phone_number,
-                   old_day=birth_date_split[0],
-                   old_month=birth_date_split[1],
-                   old_year=birth_date_split[2],
+                   old_day=user_entry.birth_date.day ,
+                   old_month=user_entry.birth_date.month ,
+                   old_year=user_entry.birth_date.year ,
                    gender=user_entry.gender
         )
 
@@ -423,17 +431,19 @@ def update_profile_data():
         else:
                 user_entry = PatientInfo.query.filter_by(user_id=session["user_id"]).first()
 
-        auth_entry.username = request.form.get("username")
-        user_entry.first_name = request.form.get("first_name")
-        user_entry.last_name = request.form.get("last_name")
-        user_entry.gender = request.form.get("gender")
-        user_entry.phone_number = request.form.get("phone_number")
-        user_entry.birth_date = create_birth_date(
+        StringBday = create_string_date( #birthday as a string
             request.form.get("day"),
             request.form.get("month"),
             request.form.get("year")
         )
-        user_entry.update_date = CURRENT_DATE
+
+        auth_entry.username = request.form.get("username")
+        user_entry.first_name = request.form.get("first_name").lower()
+        user_entry.last_name = request.form.get("last_name").lower()
+        user_entry.gender = request.form.get("gender")
+        user_entry.phone_number = request.form.get("phone_number")
+        user_entry.birth_date = datetime.strptime(StringBday,"%d-%m-%Y").date()
+        user_entry.update_date = date.today()
 
         db.session.commit()
 
@@ -463,7 +473,7 @@ def update_authentification_data():
 
         auth_entry.password = generate_password_hash(new_password)
         auth_entry.email = new_email
-        auth_entry.update_date = CURRENT_DATE
+        auth_entry.update_date = date.today()
 
         db.session.commit()
 
