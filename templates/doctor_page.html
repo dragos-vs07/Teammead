@@ -26,6 +26,32 @@
                         {% for message in get_flashed_messages() %}
                             <p>{{message}}</p>
                         {% endfor %}
+
+                        <h3> My consultations </h3>
+
+                     <div class ="consultation_container">
+                        {% for c in doctor.consultations %}
+                            <div class ="consultation_box">
+                        
+                                <p> first name: {{c.patient.first_name}} </p>
+                                <p> last name: {{c.patient.last_name}} </p>
+                                <p> date: {{c.consultation_date}} </p>
+                                <p> weight: {{c.weight}} </p>
+                                <p> diagnostic: {{c.diagnostic}} </p>
+                                <p> health state: {{c.health_state}} </p>
+
+                                {% if c.upload_file_path is not none %}
+                                    <a href="{{ url_for('download_attachment', consultation_id = c.id) }}">
+                                        <button class ="download_button">
+                                            download attachment
+                                        </button>
+                                    </a>
+                                {% endif %}
+
+                            </div>
+                            <hr class ="between_consultations">
+                        {% endfor %}
+                    </div>
          </div>
 
          <br>

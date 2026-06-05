@@ -91,11 +91,14 @@
                             </button>
                         </a>
                     {% endif %}
+                    
+                    {% if c.doctor_id == session["user_id"] %}
                     <a href ="{{ url_for('load_edit_consultation_page' , consultation_id = c.id ) }}"
                         <button class ="edit_button">
                             Edit
                         </button>
                      </a>
+                    {% endif %}
                 </div>
             <hr class ="between_consultations">
             {% endfor %}

@@ -34,11 +34,15 @@ class PatientInfo(db.Model):
        last_name = db.Column(db.String(50) , nullable = False )
        birth_date = db.Column(db.Date , nullable = False)
        gender = db.Column(db.String(20), nullable = False)
-       email = db.Column(db.String(100), nullable = False)
+       contact_email = db.Column(db.String(100), nullable = False)
        phone_number = db.Column(db.String(20))
        home_adress = db.Column(db.String(100))
        update_date = db.Column(db.Date)
 
+       consultations = db.relationship(
+       "ConsultationInfo" ,
+       back_populates = "patient"
+       )
 
 class DoctorInfo(db.Model):
         __tablename__ = "doctor_info"
@@ -48,10 +52,15 @@ class DoctorInfo(db.Model):
         last_name = db.Column(db.String(50) , nullable = False )
         birth_date = db.Column(db.Date , nullable = False)
         gender = db.Column(db.String(20), nullable = False)
-        email = db.Column(db.String(100), nullable = False)
+        contact_email = db.Column(db.String(100), nullable = False)
         phone_number = db.Column(db.String(20))
         workplace_adress = db.Column(db.String(100))
         update_date = db.Column(db.Date)
+
+        consultations = db.relationship(
+        "ConsultationInfo" ,
+        back_populates = "doctor"
+        )
 
 
 class ConsultationInfo(db.Model):
@@ -66,6 +75,15 @@ class ConsultationInfo(db.Model):
         upload_file_path = db.Column(db.String(200))
         update_date = db.Column(db.Date)
 
+        patient = db.relationship(
+        "PatientInfo",
+        back_populates="consultations"
+        )
+
+        doctor = db.relationship(
+        "DoctorInfo",
+        back_populates="consultations"
+        )
 
 # =========================
 # HELPERS
@@ -100,7 +118,7 @@ def load_patient_page():
                 "patient_page.html",
                 first_name = user.first_name.title(),
                 last_name = user.last_name.title(),
-                consultations = ConsultationInfo.query.filter_by(patient_id = session["user_id"])
+                patient = user 
         )
 
 
@@ -117,7 +135,8 @@ def load_doctor_page():
         return render_template(
             "doctor_page.html",
             first_name = user.first_name.title(),
-            last_name = user.last_name.title()
+            last_name = user.last_name.title() ,
+            doctor = user
         )
 
 
@@ -182,7 +201,7 @@ def submit_register_data():
                       last_name = request.form.get("last_name").lower(),
                       birth_date = datetime.strptime(StringBday,"%d-%m-%Y").date() ,
                       gender = request.form.get("gender"),
-                      email = new_user.email,
+                      contact_email = request.form.get("contact_email"), 
                       phone_number = request.form.get("phone_number"),
                       update_date = date.today()
                )
@@ -195,7 +214,7 @@ def submit_register_data():
                       last_name = request.form.get("last_name").lower(),
                       birth_date = datetime.strptime(StringBday,"%d-%m-%Y").date() ,
                       gender = request.form.get("gender"),
-                      email = new_user.email,
+                      contact_email = request.form.get("contact_email"),
                       phone_number = request.form.get("phone_number"),
                       update_date = date.today()
                )
@@ -264,11 +283,11 @@ def display_patient_info():
                         flash("Patient doesnt exist")
                         return redirect(url_for('load_doctor_page'))
 
-                session["patient_id"] = query_patient.user_id
+                session["patient_id"] = query_patient.id
 
         else:
                 query_patient = PatientInfo.query.filter_by(
-                    user_id=session["patient_id"]
+                    id=session["patient_id"]
                 ).first()
 
                 patient_first_name = query_patient.first_name
@@ -279,7 +298,7 @@ def display_patient_info():
                 return redirect(url_for('load_doctor_page'))
 
         consultations_data = ConsultationInfo.query.filter_by(
-            patient_id=query_patient.user_id
+            patient_id=query_patient.id
         ).all()
 
         return render_template(
@@ -288,7 +307,7 @@ def display_patient_info():
             last_name=patient_last_name.title(),
             birth_date=query_patient.birth_date,
             gender=query_patient.gender,
-            email=query_patient.email,
+            email=query_patient.contact_email,
             phone_number=query_patient.phone_number,
             consultations=[{ # making the consultations dictionaries so we can convert them to json for the javascript part
                 "id": c.id ,
@@ -307,7 +326,7 @@ def display_patient_info():
 def submit_consultation():
 
         doc = DoctorInfo.query.filter_by(user_id=session["user_id"]).first()
-        pat = PatientInfo.query.filter_by(user_id=session["patient_id"]).first()
+        pat = PatientInfo.query.filter_by(id=session["patient_id"]).first()
 
         if not pat :
                 flash("No patient found")
@@ -336,8 +355,8 @@ def submit_consultation():
                 weight=request.form.get("weight"),
                 diagnostic=request.form.get("diagnostic"),
                 consultation_date=datetime.strptime(ConsultationDateString,"%d-%m-%Y").date() ,
-                doctor_id=doc.user_id,
-                patient_id=pat.user_id,
+                doctor_id=doc.id,
+                patient_id=pat.id,
                 health_state=request.form.get("health_state"),
                 upload_file_path=file_path,
         )

@@ -1,3 +1,17 @@
 body{
     font-family: Verdana;
 }
+.consultation_container{
+    
+    width: 50%;
+    border-style: solid;
+    border-color:rgb(86, 86, 86);
+    
+}
+.consultation_box{
+    padding-left: 10px;
+}
+.between_consultations{
+    height: 5px;
+    background-color:rgb(182, 178, 178);
+}
