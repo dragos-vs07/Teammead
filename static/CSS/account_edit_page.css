@@ -4,3 +4,33 @@ body{
 .input_box{
     width: 20%;
 }
+.deactivate_button{
+    padding: 3px;
+    background-color:rgb(166, 1, 1);
+    color:white;
+    cursor: pointer;
+}
+#confirm_window{
+    display: none;
+    border-style: solid;
+    border-color: rgb(56, 56, 56);
+    background-color: rgb(213, 213, 213);
+    padding: 5px;
+
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+#old_password_required_window{
+    display: none;
+     border-style: solid;
+    border-color: rgb(56, 56, 56);
+    background-color: rgb(213, 213, 213);
+    padding: 5px;
+
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}

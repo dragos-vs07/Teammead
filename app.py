@@ -1,4 +1,4 @@
-from flask import Flask , render_template , request , flash , redirect , url_for , session , send_file
+from flask import Flask , render_template , request , flash , redirect , url_for , session , send_file , jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime , date
 from werkzeug.security import generate_password_hash , check_password_hash
@@ -23,6 +23,7 @@ class UserAuth(db.Model):
         username = db.Column(db.String(80) , unique = True , nullable = False)
         password = db.Column(db.String(200) , nullable = False)
         email = db.Column(db.String(200) , nullable = False)
+        active = db.Column(db.Boolean , nullable = False)
         update_date = db.Column(db.Date)
 
 
@@ -182,6 +183,7 @@ def submit_register_data():
             username=username,
             password=generate_password_hash(password),
             email=email,
+            active = True ,
             update_date=date.today()
         )
 
@@ -236,8 +238,8 @@ def submit_login_data():
         username = request.form.get("username")
         input_password = request.form.get("password")
 
-        found_user_by_username = UserAuth.query.filter_by(username=username).first()
-        found_user_by_email = UserAuth.query.filter_by(email=username).first()
+        found_user_by_username = UserAuth.query.filter_by(username=username , active = True).first()
+        found_user_by_email = UserAuth.query.filter_by(email=username , active = True).first()
 
         if not found_user_by_username  and not found_user_by_email :
                flash("Wrong authentification data")
@@ -475,20 +477,23 @@ def update_authentification_data():
 
         auth_entry = UserAuth.query.filter_by(id=session["user_id"]).first()
 
-        old_password_input = request.form.get("old_password")
-        new_password = request.form.get("new_password")
-        new_email = request.form.get("new_email")
+        data = request.get_json()
+        old_password_input = data.get("old_password")
+        new_password = data.get("new_password")
+        new_email = data.get("new_email")
 
         if not check_password_hash(auth_entry.password, old_password_input):
-                flash("Old password is wrong")
-                return redirect(url_for("load_edit_account_page"))
+                return jsonify({"success" : False ,
+                                "message" : "Wrong password"
+                                })
 
         if not new_password:
                 new_password = old_password_input
 
         if not new_email:
-                flash("Must input a valid email")
-                return redirect(url_for("load_edit_account_page"))
+                return jsonify({"success" : False ,
+                                "message" : "Must input valid Email"
+                                })
 
         auth_entry.password = generate_password_hash(new_password)
         auth_entry.email = new_email
@@ -496,10 +501,25 @@ def update_authentification_data():
 
         db.session.commit()
 
-        flash("Authentification data updated successfully")
-        return redirect(url_for("load_edit_account_page"))
+        return jsonify({"success" : True })
 
-
+@app.route('/deactivate_account' , methods = ["POST"])
+def deactivate_account():
+        data = request.get_json()
+        input_password = data.get("input_password")
+        auth_entry =  UserAuth.query.filter_by(id = session["user_id"]) .first()
+        
+        if check_password_hash( auth_entry.password , input_password ):
+                auth_entry.active = False
+                db.session.commit()
+                return jsonify({"success": True})
+        else:
+                return jsonify({"success": False})
+        
+@app.route('/logout')
+def logout():
+        session.clear();
+        return redirect(url_for("load_main_page"))
 # =========================
 # APP INIT
 # =========================

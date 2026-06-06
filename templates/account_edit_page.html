@@ -10,18 +10,25 @@
 
         <h2> Edit your account authentification data</h2>
 
-        <form method="POST" action = "/submit_changes_auth" class ="changes_form">   
-                <input type="text"  name="old_password"  placeholder = "Old password"  class ="input_box">
-                <br>
-                <br>
+        <form  method="POST" id = "submit_changes_form" onsubmit="return false;" class ="changes_form">   
                 <input type="text"  name="new_password"  placeholder = "New Password (optional)"  class ="input_box">
                 <br>
                 <br>
                 <input type="text"  name="new_email"  placeholder = "New Email" value = {{old_email}}  class ="input_box">
                 <br>
                 <br>
-                <button type="submit" class ="submit_changes_button">Submit changes</button>
+                <button type = "button" class ="submit_changes_button" onclick = "open_password_change_window()">Submit changes</button>
+                <br>
+                <br>
         </form>
+        
+        <div id = "old_password_required_window" >
+
+                <p>In order to change authentification data , please confirm your current password</p>
+                <input type="text" id ="old_password" placeholder ="Enter password">
+                <button onclick = "submit_password_change()">Confirm</button>
+                <button onclick = "close_password_change_window()">Cancel</button>
+        </div>
 
         <h2> Edit your profile </h2>
 
@@ -91,9 +98,28 @@
                 <button type ="submit">Submit changes</button>
             </form>
             
+                <br>
+                <br>
+
+                <button onclick = "logout_user()">Log out</button>
+            <button onclick = "open_confirm_window()" class ="deactivate_button">Deactivate account</button>
+
+            <div id ="confirm_window">
+                    <p>Are you sure you want to deactivate your account?</p>
+                    <p>All your appointments will be canceled and only an administrator can reactivate your account</p>
+
+                    <input type="text" id="confirm_password" placeholder="Enter password">
+
+                    <button onclick = "submit_deactivation()">Confirm</button>
+                    <button onclick = "close_confirm_window()">Cancel</button>
+
+            </div>
+
             {% for message in get_flashed_messages() %}
                 <p>{{message}}</p>
             {% endfor %}
+            
+            <script src = "{{ url_for('static' , filename = 'JavaScript/account_edit_page.js') }}"></script>
     </body>
 
 </html>
