@@ -42,7 +42,8 @@ class PatientInfo(db.Model):
 
        consultations = db.relationship(
        "ConsultationInfo" ,
-       back_populates = "patient"
+       back_populates = "patient" ,
+       order_by="ConsultationInfo.consultation_date.desc()"
        )
 
 class DoctorInfo(db.Model):
@@ -56,11 +57,13 @@ class DoctorInfo(db.Model):
         contact_email = db.Column(db.String(100), nullable = False)
         phone_number = db.Column(db.String(20))
         workplace_adress = db.Column(db.String(100))
+        specialisation = db.Column(db.String(100))
         update_date = db.Column(db.Date)
 
         consultations = db.relationship(
         "ConsultationInfo" ,
-        back_populates = "doctor"
+        back_populates = "doctor" ,
+        order_by="ConsultationInfo.consultation_date.desc()"
         )
 
 
@@ -110,7 +113,7 @@ def load_edit_consultation_page(consultation_id):
 @app.route('/patient_info') # loads page for a patient user
 def load_patient_page():
 
-        if "user_id" not in session:
+        if "user_id" not in session or session["role"] != "patient":
                return redirect(url_for("load_main_page"))
         
         user = PatientInfo.query.filter_by(user_id = session["user_id"]).first()
@@ -126,7 +129,7 @@ def load_patient_page():
 @app.route('/doctor_page') # loads page for a doctor user
 def load_doctor_page():
 
-        if "user_id" not in session:
+        if "user_id" not in session or session["role"] != "doctor":
                return redirect(url_for("load_main_page"))
         
         session["patient_id"] = 0
@@ -190,10 +193,18 @@ def submit_register_data():
         db.session.add(new_user)
         db.session.commit()
 
+        day = request.form.get("day")
+        month = request.form.get("month")
+        year = request.form.get("year")
+
+        if not day or not month or not year :
+                flash("Consultation date must be completed")
+                return redirect( url_for("load_register_page") )
+
         StringBday = create_string_date( #birthday as a string
-            request.form.get("day"),
-            request.form.get("month"),
-            request.form.get("year")
+            day ,
+            month ,
+            year
         )
 
         if is_doctor == "on":
@@ -299,10 +310,6 @@ def display_patient_info():
                 flash("Patient doesnt exist")
                 return redirect(url_for('load_doctor_page'))
 
-        consultations_data = ConsultationInfo.query.filter_by(
-            patient_id=query_patient.id
-        ).all()
-
         return render_template(
             "patient_result.html",
             first_name=patient_first_name.title(),
@@ -317,10 +324,11 @@ def display_patient_info():
                 "diagnostic": c.diagnostic,
                 "consultation_date": c.consultation_date,
                 "health_state": c.health_state ,
-                "upload_file_path" : c.upload_file_path
+                "upload_file_path" : c.upload_file_path ,
+                "doctor_user_id" : c.doctor.user_id
             }
-            for c in consultations_data
-            ] ,
+            for c in query_patient.consultations
+            ] , 
             update_date=date.today() ,
         )
 
@@ -386,17 +394,22 @@ def apply_changes(consultation_id):
         consultation.diagnostic = request.form.get("diagnostic")
         consultation.health_state = request.form.get("health_state")
 
+
+        day = request.form.get("day")
+        month = request.form.get("month")
+        year = request.form.get("year")
+
+        if not day or not month or not year :
+                flash("Consultation date must be completed")
+                return redirect(url_for("load_edit_consultation_page", consultation_id=consultation_id))
+
         ConsultationDateString = create_string_date( #birthday as a string
-            request.form.get("day"),
-            request.form.get("month"),
-            request.form.get("year")
+            day ,
+            month ,
+            year
         )
 
         consultation.consultation_date = datetime.strptime(ConsultationDateString,"%d-%m-%Y").date() 
-
-        if not consultation.consultation_date :
-                flash("Consultation date must be completed")
-                return redirect(url_for("load_edit_consultation_page", consultation_id=consultation_id))
 
         if not consultation.diagnostic :
                 flash("Diagnostic must be completed")
@@ -422,18 +435,22 @@ def download_attachment(consultation_id):
 def load_edit_account_page(): # loads the edit account menu
 
         auth_entry = UserAuth.query.filter_by(id=session["user_id"]).first()
+        specialisation = ""
 
         if session['role'] == "doctor":
                 user_entry = DoctorInfo.query.filter_by(user_id=session["user_id"]).first()
+                specialisation = user_entry.specialisation
         else:
                 user_entry = PatientInfo.query.filter_by(user_id=session["user_id"]).first()
 
+        
         return render_template(
                  "account_edit_page.html",
                    old_email=auth_entry.email,
                    old_username=auth_entry.username,
                    old_first_name=user_entry.first_name.title(),
                    old_last_name=user_entry.last_name.title(),
+                   old_specialisation=specialisation , # null if user is a patient , checked anyway in jinja
                    old_phone_number=user_entry.phone_number,
                    old_day=user_entry.birth_date.day ,
                    old_month=user_entry.birth_date.month ,
@@ -449,6 +466,7 @@ def update_profile_data():
 
         if session['role'] == "doctor":
                 user_entry = DoctorInfo.query.filter_by(user_id=session["user_id"]).first()
+                user_entry.specialisation = request.form.get("specialisation")
         else:
                 user_entry = PatientInfo.query.filter_by(user_id=session["user_id"]).first()
 

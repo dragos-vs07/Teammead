@@ -15,3 +15,13 @@ body{
     height: 5px;
     background-color:rgb(182, 178, 178);
 }
+.edit_button{
+    text-decoration: none;
+    background-color:rgb(169, 169, 169);
+    color: white;
+    cursor: pointer;
+    padding: 3px;
+    border-style: solid;
+    border-color:rgb(119, 119, 119);
+    border-radius: 2px;
+}

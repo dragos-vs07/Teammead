@@ -52,6 +52,15 @@
                 <br>
                 <br>
 
+                {% if session["role"] == "doctor" %}
+                    <label> Specialisation: </label>
+                    <input type="text" name="specialisation"  value = {{old_specialisation}}>
+
+                    <br>
+                    <br>
+
+                {% endif %}
+
                 <label>Gender:</label>
 
                 <input

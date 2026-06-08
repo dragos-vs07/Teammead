@@ -35,7 +35,7 @@
                         
                                 <p> first name: {{c.patient.first_name}} </p>
                                 <p> last name: {{c.patient.last_name}} </p>
-                                <p> date: {{c.consultation_date}} </p>
+                                <p> date: {{c.consultation_date.strftime("%d-%m-%Y")}} </p>
                                 <p> weight: {{c.weight}} </p>
                                 <p> diagnostic: {{c.diagnostic}} </p>
                                 <p> health state: {{c.health_state}} </p>
@@ -47,6 +47,12 @@
                                         </button>
                                     </a>
                                 {% endif %}
+                                
+                                <a href ="{{ url_for('load_edit_consultation_page' , consultation_id = c.id ) }}"
+                                    <button class ="edit_button">
+                                        Edit
+                                    </button>
+                                 </a>
 
                             </div>
                             <hr class ="between_consultations">
