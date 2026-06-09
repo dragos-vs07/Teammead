@@ -6,50 +6,76 @@
         <title>Teammed</title>
     </head>
     <body>
-            <h2>Information for patient {{ first_name }} {{ last_name }} </h3>
-            
-            <br>
 
-            <div class = "left_side">
-     
-                    <h3>My consultations:</h2>
+            <div class ="content">
+                    <div class = "left_side">
 
-                    <div class ="consultation_container">
+                            <h2>Information for patient {{ first_name }} {{ last_name }} </h2>
+                            
+                                <br>
 
-                        {% for c in patient.consultations %}
+                            <h3>My consultations:</h3>
 
-                            <div class ="consultation_box">
+                            <div class ="consultation_container">
 
-                                <p> date: {{c.consultation_date}} </p>
-                                <p> weight: {{c.weight}} </p>
-                                <p> diagnostic: {{c.diagnostic}} </p>
-                                <p> health state: {{c.health_state}} </p>
+                                {% for c in patient.consultations %}
 
-                                {% if c.upload_file_path is not none %}
-                                    <a href="{{ url_for('download_attachment', consultation_id = c.id) }}">
-                                        <button class ="download_button">
-                                            download attachment
-                                        </button>
-                                    </a>
-                                {% endif %}
+                                    <div class ="consultation_box">
+
+                                        <p> date: {{c.consultation_date}} </p>
+                                        <p> weight: {{c.weight}} </p>
+                                        <p> diagnostic: {{c.diagnostic}} </p>
+                                        <p> health state: {{c.health_state}} </p>
+
+                                        {% if c.upload_file_path is not none %}
+                                            <a href="{{ url_for('download_attachment', consultation_id = c.id) }}">
+                                                <button class ="download_button">
+                                                    download attachment
+                                                </button>
+                                            </a>
+                                        {% endif %}
+
+                                    </div>
+
+                                    <hr class ="between">
+
+                                {% endfor %}
 
                             </div>
+                    </div>
 
-                            <hr class ="between_consultations">
+                    <div class = "right_side">
 
-                        {% endfor %}
+                        <br>
+                        <br>
 
+                            <button class="edit_button" onclick="window.location.href='/edit_account'">
+                                Edit Account
+                            </button>
+
+                        <br>
+                        <br>
+                            <button onclick = "logout_user()">Log out</button>
+
+                        <br>
+                        <br>
+                            <h3>My doctors:</h3>
+
+                            <div class ="my_doctors_list">
+                                    {% for d in doctors %}
+                                        <div class ="doctor_box">
+                                            <p> Dr. {{d.first_name.title()}} {{d.last_name.title()}}</p>
+                                        </div>
+
+                                    {% endfor %}
+                            </div>
+
+                            
                     </div>
             </div>
-
-            <div class = "right_side">
-                    <button class="edit_button" onclick="window.location.href='/edit_account'">
-                         Edit Account
-                    </button>
-            </div>
             
 
-            
+            <script src = "{{ url_for('static' , filename = 'JavaScript/patient_page.js') }}"></script>
     </body>
 
 </html>

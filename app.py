@@ -5,13 +5,11 @@ from werkzeug.security import generate_password_hash , check_password_hash
 import os
 
 app = Flask(__name__)
-app.secret_key = "supersecretkey"
+app.secret_key = "g6fd58734hj]5gkh53489dsf87324.jhg234jh!!kg39081098374#"
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
 db = SQLAlchemy(app)  # not the database , but the controller of it    
-
 
 # =========================
 # MODELS
@@ -96,45 +94,80 @@ class ConsultationInfo(db.Model):
 def create_string_date( day , month , year):
         return f"{day}-{month}-{year}"
 
-
 # =========================
-# MAIN PAGES
+# LOADING PAGES 
 # =========================
 
 @app.route('/')
 def load_main_page():
         return render_template("index.html")
 
+@app.route('/edit_account')
+def load_edit_account_page(): # loads the edit account menu
+
+        if "user_id" not in session : # only doctor can access this
+               return redirect(url_for("load_main_page"))
+        
+        auth_entry = UserAuth.query.filter_by(id=session.get("user_id")).first()
+        specialisation = ""
+
+        if session.get("role") == "doctor":
+                user_entry = DoctorInfo.query.filter_by(user_id=session.get("user_id")).first()
+                specialisation = user_entry.specialisation
+        else:
+                user_entry = PatientInfo.query.filter_by(user_id=session.get("user_id")).first()
+
+        
+        return render_template(
+                 "account_edit_page.html",
+                   old_email=auth_entry.email,
+                   old_username=auth_entry.username,
+                   old_first_name=user_entry.first_name.title(),
+                   old_last_name=user_entry.last_name.title(),
+                   old_specialisation=specialisation , # null if user is a patient , checked anyway in jinja
+                   old_phone_number=user_entry.phone_number,
+                   old_day=user_entry.birth_date.day ,
+                   old_month=user_entry.birth_date.month ,
+                   old_year=user_entry.birth_date.year ,
+                   gender=user_entry.gender
+        )
+
 @app.route('/load_edit_consultation_page/<consultation_id>')
 def load_edit_consultation_page(consultation_id):
+
+        if "user_id" not in session or session.get("role") != "doctor": # only doctor can access this
+               return redirect(url_for("load_main_page"))
+        
         return render_template("edit_consultation_page.html",
                                c = ConsultationInfo.query.filter_by(id = consultation_id).first()
                                )
+
 @app.route('/patient_info') # loads page for a patient user
 def load_patient_page():
 
-        if "user_id" not in session or session["role"] != "patient":
+        if "user_id" not in session or session.get("role") != "patient": # only patient can access this
                return redirect(url_for("load_main_page"))
         
-        user = PatientInfo.query.filter_by(user_id = session["user_id"]).first()
+        user = PatientInfo.query.filter_by(user_id = session.get("user_id")).first()
 
         return render_template(
                 "patient_page.html",
                 first_name = user.first_name.title(),
                 last_name = user.last_name.title(),
-                patient = user 
+                patient = user ,
+                doctors = list({c.doctor for c in user.consultations})
         )
 
 
 @app.route('/doctor_page') # loads page for a doctor user
 def load_doctor_page():
 
-        if "user_id" not in session or session["role"] != "doctor":
+        if "user_id" not in session or session.get("role") != "doctor": # only doctor can access this
                return redirect(url_for("load_main_page"))
         
         session["patient_id"] = 0
 
-        user = DoctorInfo.query.filter_by(user_id = session["user_id"]).first()
+        user = DoctorInfo.query.filter_by(user_id = session.get("user_id")).first()
 
         return render_template(
             "doctor_page.html",
@@ -143,15 +176,68 @@ def load_doctor_page():
             doctor = user
         )
 
-
-# =========================
-# REGISTER
-# =========================
-
 @app.route('/register') # loads register menu
 def load_register_page():
         return render_template("register.html")
 
+@app.route('/find_patient' , methods=["POST","GET"]) # displays results for a sought patient
+def load_patient_result_page():
+
+        if "user_id" not in session or session.get("role") != "doctor": # only doctor can access this
+               return redirect(url_for("load_main_page"))
+        
+        if not session.get("patient_id") :
+                patient_first_name = request.form.get("first_name")
+                patient_last_name = request.form.get("last_name")
+
+                query_patient = PatientInfo.query.filter_by(
+                    first_name=patient_first_name.lower(),
+                    last_name=patient_last_name.lower()
+                ).first()
+
+                if not query_patient :
+                        flash("Patient doesnt exist")
+                        return redirect(url_for('load_doctor_page'))
+
+                session["patient_id"] = query_patient.id
+
+        else:
+                query_patient = PatientInfo.query.filter_by(
+                    id=session.get("patient_id")
+                ).first()
+
+                patient_first_name = query_patient.first_name
+                patient_last_name = query_patient.last_name
+
+        if not query_patient :
+                flash("Patient doesnt exist")
+                return redirect(url_for('load_doctor_page'))
+
+        return render_template(
+            "patient_result.html",
+            first_name=patient_first_name.title(),
+            last_name=patient_last_name.title(),
+            birth_date=query_patient.birth_date,
+            gender=query_patient.gender,
+            email=query_patient.contact_email,
+            phone_number=query_patient.phone_number,
+            consultations=[{ # making the consultations dictionaries so we can convert them to json for the javascript part
+                "id": c.id ,
+                "weight": c.weight,
+                "diagnostic": c.diagnostic,
+                "consultation_date": c.consultation_date,
+                "health_state": c.health_state ,
+                "upload_file_path" : c.upload_file_path ,
+                "doctor_user_id" : c.doctor.user_id
+            }
+            for c in query_patient.consultations
+            ] , 
+            update_date=date.today() ,
+        )
+
+# =========================
+# REGISTER
+# =========================
 
 @app.route('/submit_register' , methods=["POST"]) # addsa new user to database
 def submit_register_data():
@@ -198,7 +284,7 @@ def submit_register_data():
         year = request.form.get("year")
 
         if not day or not month or not year :
-                flash("Consultation date must be completed")
+                flash("Birthday date must be completed")
                 return redirect( url_for("load_register_page") )
 
         StringBday = create_string_date( #birthday as a string
@@ -249,6 +335,14 @@ def submit_login_data():
         username = request.form.get("username")
         input_password = request.form.get("password")
 
+        if not username:
+                flash("Must input username or email")
+                return redirect(url_for("load_main_page"))
+        
+        if not input_password:
+                flash("Must input password")
+                return redirect(url_for("load_main_page"))
+        
         found_user_by_username = UserAuth.query.filter_by(username=username , active = True).first()
         found_user_by_email = UserAuth.query.filter_by(email=username , active = True).first()
 
@@ -261,6 +355,8 @@ def submit_login_data():
         else:
                 found_user = found_user_by_username
 
+        
+        
         if not check_password_hash(found_user.password, input_password):
                 flash("Wrong authentification data")
                 return redirect(url_for("load_main_page"))
@@ -280,67 +376,18 @@ def submit_login_data():
 # PATIENT + DOCTOR FEATURES
 # =========================
 
-@app.route('/find_patient' , methods=["POST","GET"]) # displays results for a sought patient
-def display_patient_info():
-
-        if not session["patient_id"] :
-                patient_first_name = request.form.get("first_name")
-                patient_last_name = request.form.get("last_name")
-
-                query_patient = PatientInfo.query.filter_by(
-                    first_name=patient_first_name.lower(),
-                    last_name=patient_last_name.lower()
-                ).first()
-
-                if not query_patient :
-                        flash("Patient doesnt exist")
-                        return redirect(url_for('load_doctor_page'))
-
-                session["patient_id"] = query_patient.id
-
-        else:
-                query_patient = PatientInfo.query.filter_by(
-                    id=session["patient_id"]
-                ).first()
-
-                patient_first_name = query_patient.first_name
-                patient_last_name = query_patient.last_name
-
-        if not query_patient :
-                flash("Patient doesnt exist")
-                return redirect(url_for('load_doctor_page'))
-
-        return render_template(
-            "patient_result.html",
-            first_name=patient_first_name.title(),
-            last_name=patient_last_name.title(),
-            birth_date=query_patient.birth_date,
-            gender=query_patient.gender,
-            email=query_patient.contact_email,
-            phone_number=query_patient.phone_number,
-            consultations=[{ # making the consultations dictionaries so we can convert them to json for the javascript part
-                "id": c.id ,
-                "weight": c.weight,
-                "diagnostic": c.diagnostic,
-                "consultation_date": c.consultation_date,
-                "health_state": c.health_state ,
-                "upload_file_path" : c.upload_file_path ,
-                "doctor_user_id" : c.doctor.user_id
-            }
-            for c in query_patient.consultations
-            ] , 
-            update_date=date.today() ,
-        )
-
 @app.route('/reg_consultation' , methods=["POST"])  # adds new consultation to database
 def submit_consultation():
 
-        doc = DoctorInfo.query.filter_by(user_id=session["user_id"]).first()
-        pat = PatientInfo.query.filter_by(id=session["patient_id"]).first()
+        if "user_id" not in session or session.get("role") != "doctor": # only doctor can access this
+               return redirect(url_for("load_main_page"))
+         
+        doc = DoctorInfo.query.filter_by(user_id=session.get("user_id")).first()
+        pat = PatientInfo.query.filter_by(id=session.get("patient_id")).first()
 
         if not pat :
                 flash("No patient found")
-                return redirect(url_for("display_patient_info"))
+                return redirect(url_for("load_patient_result_page"))
 
         first_name = pat.first_name.lower()
         last_name = pat.last_name.lower()
@@ -349,10 +396,10 @@ def submit_consultation():
         file_path = None
 
         if file and file.filename:
-                base = fr"C:\Users\Dragos\Desktop\Teammed\uploaded_consultation_files"
-                folder_path = fr"{base}\{first_name}_{last_name}"
+                base = os.path.join( os.path.dirname( __file__ ) , "uploaded_consultation_files" )
+                folder_path = os.path.join( base , f"{first_name}_{last_name}" )
                 os.makedirs(folder_path, exist_ok=True)
-                file_path = fr"{folder_path}\{file.filename}"
+                file_path = os.path.join( folder_path , file.filename )
                 file.save(file_path)
 
         ConsultationDateString = create_string_date( #birthday as a string
@@ -373,21 +420,24 @@ def submit_consultation():
 
         if not new_consultation.diagnostic :
                 flash("Must confirm a diagnostic")
-                return redirect(url_for("display_patient_info"))
+                return redirect(url_for("load_patient_result_page"))
         
         if not new_consultation.consultation_date :
                 flash("Must specify the date of the consultation")
-                return redirect(url_for("display_patient_info"))
+                return redirect(url_for("load_patient_result_page"))
         
         db.session.add(new_consultation)
         db.session.commit()
 
-        return redirect(url_for("display_patient_info"))
+        return redirect(url_for("load_patient_result_page"))
 
 
 @app.route('/change_consultation/<consultation_id>' , methods=["POST"])
 def apply_changes(consultation_id):
 
+        if "user_id" not in session:
+                return redirect(url_for("load_main_page"))
+        
         consultation = ConsultationInfo.query.get_or_404(consultation_id)
 
         consultation.weight = request.form.get("weight")
@@ -417,12 +467,15 @@ def apply_changes(consultation_id):
 
         db.session.commit()
 
-        return redirect(url_for("display_patient_info") )
+        return redirect(url_for("load_patient_result_page") )
 
 
 @app.route('/download_attachment/<int:consultation_id>')  # downloads attachement to consultation
 def download_attachment(consultation_id):
 
+        if "user_id" not in session:
+                return redirect(url_for("load_main_page"))
+        
         consultation = ConsultationInfo.query.get_or_404(consultation_id)
         return send_file(consultation.upload_file_path, as_attachment=True)
 
@@ -431,44 +484,19 @@ def download_attachment(consultation_id):
 # EDIT ACCOUNT
 # =========================
 
-@app.route('/edit_account')
-def load_edit_account_page(): # loads the edit account menu
-
-        auth_entry = UserAuth.query.filter_by(id=session["user_id"]).first()
-        specialisation = ""
-
-        if session['role'] == "doctor":
-                user_entry = DoctorInfo.query.filter_by(user_id=session["user_id"]).first()
-                specialisation = user_entry.specialisation
-        else:
-                user_entry = PatientInfo.query.filter_by(user_id=session["user_id"]).first()
-
-        
-        return render_template(
-                 "account_edit_page.html",
-                   old_email=auth_entry.email,
-                   old_username=auth_entry.username,
-                   old_first_name=user_entry.first_name.title(),
-                   old_last_name=user_entry.last_name.title(),
-                   old_specialisation=specialisation , # null if user is a patient , checked anyway in jinja
-                   old_phone_number=user_entry.phone_number,
-                   old_day=user_entry.birth_date.day ,
-                   old_month=user_entry.birth_date.month ,
-                   old_year=user_entry.birth_date.year ,
-                   gender=user_entry.gender
-        )
-
-
 @app.route('/submit_changes_profile' , methods=["POST"]) # applies changes of profile data to database
 def update_profile_data():
 
-        auth_entry = UserAuth.query.filter_by(id=session["user_id"]).first()
+        if "user_id" not in session : 
+               return redirect(url_for("load_main_page"))
+        
+        auth_entry = UserAuth.query.filter_by(id=session.get("user_id")).first()
 
-        if session['role'] == "doctor":
-                user_entry = DoctorInfo.query.filter_by(user_id=session["user_id"]).first()
+        if session.get("role") == "doctor":
+                user_entry = DoctorInfo.query.filter_by(user_id=session.get("user_id")).first()
                 user_entry.specialisation = request.form.get("specialisation")
         else:
-                user_entry = PatientInfo.query.filter_by(user_id=session["user_id"]).first()
+                user_entry = PatientInfo.query.filter_by(user_id=session.get("user_id")).first()
 
         StringBday = create_string_date( #birthday as a string
             request.form.get("day"),
@@ -476,14 +504,30 @@ def update_profile_data():
             request.form.get("year")
         )
 
-        auth_entry.username = request.form.get("username")
-        user_entry.first_name = request.form.get("first_name").lower()
-        user_entry.last_name = request.form.get("last_name").lower()
+        username = request.form.get("username")
+        input_first_name = request.form.get("first_name")
+        input_last_name = request.form.get("last_name")
+
+        if not username:
+                flash("must fill in username")
+                return redirect(url_for("load_edit_account_page"))
+        
+        if not input_first_name:
+                flash("must fill in first name")
+                return redirect(url_for("load_edit_account_page"))
+        
+        if not input_last_name:
+                flash("must fill in last name")
+                return redirect(url_for("load_edit_account_page"))
+        
+        auth_entry.username = username
+        user_entry.first_name = input_first_name.lower()
+        user_entry.last_name = input_last_name.lower()
         user_entry.gender = request.form.get("gender")
         user_entry.phone_number = request.form.get("phone_number")
         user_entry.birth_date = datetime.strptime(StringBday,"%d-%m-%Y").date()
         user_entry.update_date = date.today()
-
+        
         db.session.commit()
 
         flash("Changes applied successfully")
@@ -493,25 +537,36 @@ def update_profile_data():
 @app.route('/submit_changes_auth' , methods=["POST"]) # applies changes of authentification data to database
 def update_authentification_data():
 
-        auth_entry = UserAuth.query.filter_by(id=session["user_id"]).first()
+        if "user_id" not in session : 
+               return redirect(url_for("load_main_page"))
+        
+        auth_entry = UserAuth.query.filter_by(id=session.get("user_id")).first()
 
         data = request.get_json()
         old_password_input = data.get("old_password")
         new_password = data.get("new_password")
         new_email = data.get("new_email")
 
+        if not old_password_input:
+                return jsonify({
+                        "success" : False ,
+                        "message" : "Must input password"
+                })
+        
         if not check_password_hash(auth_entry.password, old_password_input):
-                return jsonify({"success" : False ,
-                                "message" : "Wrong password"
-                                })
+                return jsonify({
+                        "success" : False ,
+                        "message" : "Wrong password"
+                })
 
         if not new_password:
                 new_password = old_password_input
 
         if not new_email:
-                return jsonify({"success" : False ,
-                                "message" : "Must input valid Email"
-                                })
+                return jsonify({
+                        "success" : False ,
+                        "message" : "Must input valid Email"
+                })
 
         auth_entry.password = generate_password_hash(new_password)
         auth_entry.email = new_email
@@ -523,9 +578,16 @@ def update_authentification_data():
 
 @app.route('/deactivate_account' , methods = ["POST"])
 def deactivate_account():
+
+        if "user_id" not in session : 
+               return redirect(url_for("load_main_page"))
+        
         data = request.get_json()
         input_password = data.get("input_password")
-        auth_entry =  UserAuth.query.filter_by(id = session["user_id"]) .first()
+        auth_entry = UserAuth.query.filter_by(id = session.get("user_id")).first()
+        
+        if not input_password:
+                return jsonify({"success": False})
         
         if check_password_hash( auth_entry.password , input_password ):
                 auth_entry.active = False
