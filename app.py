@@ -35,7 +35,7 @@ class PatientInfo(db.Model):
        gender = db.Column(db.String(20), nullable = False)
        contact_email = db.Column(db.String(100), nullable = False)
        phone_number = db.Column(db.String(20))
-       home_adress = db.Column(db.String(100))
+       adress = db.Column(db.String(100))
        update_date = db.Column(db.Date)
 
        consultations = db.relationship(
@@ -54,7 +54,7 @@ class DoctorInfo(db.Model):
         gender = db.Column(db.String(20), nullable = False)
         contact_email = db.Column(db.String(100), nullable = False)
         phone_number = db.Column(db.String(20))
-        workplace_adress = db.Column(db.String(100))
+        adress = db.Column(db.String(100))
         specialisation = db.Column(db.String(100))
         update_date = db.Column(db.Date)
 
@@ -110,13 +110,14 @@ def load_edit_account_page(): # loads the edit account menu
         
         auth_entry = UserAuth.query.filter_by(id=session.get("user_id")).first()
         specialisation = ""
-
+        
         if session.get("role") == "doctor":
                 user_entry = DoctorInfo.query.filter_by(user_id=session.get("user_id")).first()
                 specialisation = user_entry.specialisation
         else:
                 user_entry = PatientInfo.query.filter_by(user_id=session.get("user_id")).first()
-
+                
+        
         
         return render_template(
                  "account_edit_page.html",
@@ -125,6 +126,7 @@ def load_edit_account_page(): # loads the edit account menu
                    old_first_name=user_entry.first_name.title(),
                    old_last_name=user_entry.last_name.title(),
                    old_specialisation=specialisation , # null if user is a patient , checked anyway in jinja
+                   old_adress =user_entry.adress ,
                    old_phone_number=user_entry.phone_number,
                    old_day=user_entry.birth_date.day ,
                    old_month=user_entry.birth_date.month ,
@@ -234,7 +236,27 @@ def load_patient_result_page():
             ] , 
             update_date=date.today() ,
         )
+@app.route('/find_doctor/<int:doctor_id>' )
+def load_doctor_result_page(doctor_id):
 
+        if "user_id" not in session or session.get("role") != "patient": # only doctor can access this
+               return redirect(url_for("load_main_page"))
+        
+        doctor = DoctorInfo.query.filter_by(id = doctor_id ).first()
+
+        if not doctor :
+                flash("doctor not found")
+                return redirect(url_for("load_patient_page"))
+        
+        return render_template( 
+                "doctor_result.html" , 
+                first_name = doctor.first_name ,
+                last_name = doctor.last_name ,
+                specialisation = doctor.specialisation ,
+                contact_email = doctor.contact_email ,
+                phone_number = doctor.phone_number ,
+                adress = doctor.workplace_adress             
+        )
 # =========================
 # REGISTER
 # =========================
@@ -497,6 +519,7 @@ def update_profile_data():
                 user_entry.specialisation = request.form.get("specialisation")
         else:
                 user_entry = PatientInfo.query.filter_by(user_id=session.get("user_id")).first()
+                
 
         StringBday = create_string_date( #birthday as a string
             request.form.get("day"),
@@ -527,7 +550,8 @@ def update_profile_data():
         user_entry.phone_number = request.form.get("phone_number")
         user_entry.birth_date = datetime.strptime(StringBday,"%d-%m-%Y").date()
         user_entry.update_date = date.today()
-        
+        user_entry.adress = request.form.get("adress")
+
         db.session.commit()
 
         flash("Changes applied successfully")

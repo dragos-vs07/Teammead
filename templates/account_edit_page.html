@@ -35,31 +35,46 @@
         <form method = "POST" action ="/submit_changes_profile">
 
                 <label >Username:</label>
-                <input type ="text"  name="username" value = {{old_username}}>
+                <input type ="text"  name="username" value = "{{old_username}}">
 
                 <br>
                 <br>
 
                 <label >First Name:</label>
-                <input type ="text"  name="first_name" value = {{old_first_name}}>
+                <input type ="text"  name="first_name" value = "{{old_first_name}}">
 
                 <br>
                 <br>
 
                 <label >Last Name:</label>
-                <input type ="text"  name="last_name" value = {{old_last_name}}>
+                <input type ="text"  name="last_name" value = "{{old_last_name}}" >
 
                 <br>
                 <br>
 
-                {% if session["role"] == "doctor" %}
+                {% if session.get("role") == "doctor" %}
                     <label> Specialisation: </label>
-                    <input type="text" name="specialisation"  value = {{old_specialisation}}>
+                    <input type="text" name="specialisation"  value = "{{old_specialisation}}">
+
+                    <br>
+                    <br>
+
+                    <label> Workplace adress: </label>
+                    <input type="text" name="adress"  value = "{{old_adress}}">
+
+                    <br>
+                    <br>
+
+                    {% else %}
+
+                    <label>Home adress: </label>
+                    <input type="text" name="adress"  value = "{{old_adress}}">
 
                     <br>
                     <br>
 
                 {% endif %}
+                
 
                 <label>Gender:</label>
 

@@ -6,7 +6,7 @@ body{
     display: flex;
     flex-direction: column;
 
-    font-family: Verdana;
+    font-family: sans-serif;
 }
 
 .main_text{

@@ -7,12 +7,13 @@
     </head>
     <body>
 
-            <div class ="content">
-                    <div class = "left_side">
+        <div class="upper_bar">
+            <h2>Information for patient {{ first_name }} {{ last_name }} </h2>
+        </div>
 
-                            <h2>Information for patient {{ first_name }} {{ last_name }} </h2>
-                            
-                                <br>
+            <div class ="content">
+
+                    <div class = "left_side">
 
                             <h3>My consultations:</h3>
 
@@ -42,6 +43,19 @@
                                 {% endfor %}
 
                             </div>
+
+                            <h3>My doctors:</h3>
+
+                            <div class ="my_doctors_list">
+                                    {% for d in doctors %}
+                                        
+                                            <button onclick="redirect_to_doctor_page({{d.id}})" class ="doctor_page_button"> 
+                                                Dr. {{d.first_name.title()}} {{d.last_name.title()}} 
+                                            </button>
+                                        
+                                    <hr class ="between">
+                                    {% endfor %}
+                            </div>
                     </div>
 
                     <div class = "right_side">
@@ -55,22 +69,8 @@
 
                         <br>
                         <br>
-                            <button onclick = "logout_user()">Log out</button>
+                            <button onclick = "logout_user()" class="logout_button">Log out</button>
 
-                        <br>
-                        <br>
-                            <h3>My doctors:</h3>
-
-                            <div class ="my_doctors_list">
-                                    {% for d in doctors %}
-                                        <div class ="doctor_box">
-                                            <p> Dr. {{d.first_name.title()}} {{d.last_name.title()}}</p>
-                                        </div>
-
-                                    {% endfor %}
-                            </div>
-
-                            
                     </div>
             </div>
             

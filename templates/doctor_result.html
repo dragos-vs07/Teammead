@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='CSS/doctor_result.css') }}">
+        <title>Teammed</title>
+    </head>
+    <body>
+
+        <div class="upper_bar">
+            <h2>Results for Dr. {{ first_name.title() }} {{ last_name.title() }} </h2>
+        </div>
+
+            <div class ="content">
+
+                <p> Specialisation : {{specialisation}} </p>
+
+                <br>
+
+                <h3> Contact information: </h3>
+
+                    <p> Email: {{contact_email}}</p>
+
+                    <p> Phone number: {{phone_number}} </p>
+
+                    <p> Adress: {{adress}} </p>
+
+                   
+                   
+            </div>
+
+            
+    </body>
+
+</html>
