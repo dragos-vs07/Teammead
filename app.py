@@ -41,7 +41,7 @@ class PatientInfo(db.Model):
        consultations = db.relationship(
        "ConsultationInfo" ,
        back_populates = "patient" ,
-       order_by="ConsultationInfo.consultation_date.desc()"
+       order_by="ConsultationInfo.consultation_date.asc()"
        )
 
 class DoctorInfo(db.Model):
@@ -61,7 +61,7 @@ class DoctorInfo(db.Model):
         consultations = db.relationship(
         "ConsultationInfo" ,
         back_populates = "doctor" ,
-        order_by="ConsultationInfo.consultation_date.desc()"
+        order_by="ConsultationInfo.consultation_date.asc()"
         )
 
 
@@ -255,7 +255,7 @@ def load_doctor_result_page(doctor_id):
                 specialisation = doctor.specialisation ,
                 contact_email = doctor.contact_email ,
                 phone_number = doctor.phone_number ,
-                adress = doctor.workplace_adress             
+                adress = doctor.adress             
         )
 # =========================
 # REGISTER

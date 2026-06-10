@@ -7,19 +7,26 @@
     </head>
     <body>
 
-        <div class="upper_bar">
-            <h2>Information for patient {{ first_name }} {{ last_name }} </h2>
-        </div>
+        
 
             <div class ="content">
 
+                
                     <div class = "left_side">
+                    
+                        <div class="upper_bar">
+                             <h2>Information for patient {{ first_name }} {{ last_name }} </h2>
+                         </div>
 
-                            <h3>My consultations:</h3>
+                            <div class ="small_header">
+                                <h3>MY CONSULTATIONS:</h3>
+                            </div>
+                            
+                            <br>
 
                             <div class ="consultation_container">
 
-                                {% for c in patient.consultations %}
+                                {% for c in patient.consultations | reverse %}
 
                                     <div class ="consultation_box">
 
@@ -38,13 +45,17 @@
 
                                     </div>
 
-                                    <hr class ="between">
-
                                 {% endfor %}
 
                             </div>
+                            
+                            <br>
 
-                            <h3>My doctors:</h3>
+                            <div class ="small_header">
+                                <h3>MY DOCTORS:</h3>
+                            </div>
+
+                            <br>
 
                             <div class ="my_doctors_list">
                                     {% for d in doctors %}
@@ -52,13 +63,17 @@
                                             <button onclick="redirect_to_doctor_page({{d.id}})" class ="doctor_page_button"> 
                                                 Dr. {{d.first_name.title()}} {{d.last_name.title()}} 
                                             </button>
-                                        
-                                    <hr class ="between">
+                                    
                                     {% endfor %}
                             </div>
                     </div>
 
                     <div class = "right_side">
+                        
+                        <br>
+                        <br>
+                        
+                            </span><span class="second_half">Team</span><span class="third_half">med</span>
 
                         <br>
                         <br>

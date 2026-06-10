@@ -77,7 +77,7 @@
         <h4> Consultations: </h4>
 
         <div class ="consultation_container">
-            {% for c in consultations %}
+            {% for c in consultations | reverse %}
             
                 <div class ="consultation_box">
                     <p> date: {{ c.consultation_date.strftime("%d-%m-%Y") }} </p>
