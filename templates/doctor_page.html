@@ -31,7 +31,7 @@
 
                 <div class ="upper_area">
                      <div class ="consultation_container">
-                        {% for c in doctor.consultations %}
+                        {% for c in doctor.consultations | reverse %}
                             <div class ="consultation_box">
                         
                                 <p> first name: {{c.patient.first_name}} </p>
