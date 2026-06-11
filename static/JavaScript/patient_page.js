@@ -16,31 +16,6 @@ let xValues = consultations_list.map(c => {
   });
 });
 
-let yValues = consultations_list.map(c => c.weight)
-
-const weight_canvas = document.getElementById("weight_chart");
-
-new Chart(weight_canvas, {
-  type: "line",
-  data: {
-    labels: xValues,
-    datasets: [{
-      label: "Weight",
-      data: yValues,
-      borderColor: "#30E4FF",
-      tension: 0.3
-    }]
-  },
-  options: {
-    responsive: true,
-    scales: {
-      y: {
-        beginAtZero: false
-      }
-    }
-  }
-});
-
 yValues = consultations_list.map(c => c.health_state)
 
 const health_state_canvas = document.getElementById("health_state_chart");
@@ -52,16 +27,37 @@ new Chart(health_state_canvas, {
     datasets: [{
       label: "Health state",
       data: yValues,
-      borderColor: "#30E4FF",
-      tension: 0.3
+      borderColor: "#1565C0",
+      backgroundColor: "rgba(21, 101, 192, 0.08)",
+      fill: true,
+      tension: 0.4,
+      pointRadius: 3,
+      pointHoverRadius: 5,
+      pointBackgroundColor: "#1565C0",
     }]
   },
   options: {
     responsive: true,
+    legend: {
+      display: false
+    },
     scales: {
-      y: {
-        beginAtZero: false
-      }
+      yAxes: [{
+        ticks: {
+          beginAtZero: false,
+          maxTicksLimit: 4
+        },
+        gridLines: {
+          display: false,
+          drawBorder: false
+        }
+      }],
+      xAxes: [{
+        gridLines: {
+          display: false,
+          drawBorder: false
+        }
+      }]
     }
   }
 });

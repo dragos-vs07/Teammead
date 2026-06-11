@@ -169,7 +169,7 @@ def load_patient_page():
                 "doctor_first_name": c.doctor.first_name ,
                 "doctor_last_name": c.doctor.last_name ,
                 "doctor_specialisation": c.doctor.specialisation 
-                } for c in user.consultations ]
+                } for c in user.consultations[:3] ]
         )
 
 
