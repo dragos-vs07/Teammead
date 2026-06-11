@@ -157,7 +157,19 @@ def load_patient_page():
                 first_name = user.first_name.title(),
                 last_name = user.last_name.title(),
                 patient = user ,
-                doctors = list({c.doctor for c in user.consultations})
+                doctors = list({c.doctor for c in user.consultations}) ,
+                consultations = [{
+                        "id": c.id ,
+                "weight": c.weight,
+                "diagnostic": c.diagnostic,
+                "consultation_date": c.consultation_date,
+                "health_state": c.health_state ,
+                "upload_file_path" : c.upload_file_path ,
+                "doctor_user_id" : c.doctor.user_id ,
+                "doctor_first_name": c.doctor.first_name ,
+                "doctor_last_name": c.doctor.last_name ,
+                "doctor_specialisation": c.doctor.specialisation 
+                } for c in user.consultations ]
         )
 
 
@@ -188,28 +200,22 @@ def load_patient_result_page():
         if "user_id" not in session or session.get("role") != "doctor": # only doctor can access this
                return redirect(url_for("load_main_page"))
         
-        if not session.get("patient_id") :
-                patient_first_name = request.form.get("first_name")
-                patient_last_name = request.form.get("last_name")
+        patient_first_name = request.form.get("first_name")
+        patient_last_name = request.form.get("last_name")
 
-                query_patient = PatientInfo.query.filter_by(
-                    first_name=patient_first_name.lower(),
-                    last_name=patient_last_name.lower()
+        if not patient_first_name or not patient_last_name :
+                flash("Must complete full name")
+                return redirect(url_for('load_doctor_page'))
+        query_patient = PatientInfo.query.filter_by(
+                first_name=patient_first_name.lower(),
+                last_name=patient_last_name.lower()
                 ).first()
 
-                if not query_patient :
-                        flash("Patient doesnt exist")
-                        return redirect(url_for('load_doctor_page'))
+        if not query_patient :
+                flash("Patient doesnt exist")
+                return redirect(url_for('load_doctor_page'))
 
-                session["patient_id"] = query_patient.id
-
-        else:
-                query_patient = PatientInfo.query.filter_by(
-                    id=session.get("patient_id")
-                ).first()
-
-                patient_first_name = query_patient.first_name
-                patient_last_name = query_patient.last_name
+        session["patient_id"] = query_patient.id
 
         if not query_patient :
                 flash("Patient doesnt exist")
@@ -354,6 +360,8 @@ def submit_register_data():
 @app.route('/submit_login' , methods=["POST"]) # checks login with database 
 def submit_login_data():
 
+        session.clear();
+
         username = request.form.get("username")
         input_password = request.form.get("password")
 
@@ -384,7 +392,6 @@ def submit_login_data():
                 return redirect(url_for("load_main_page"))
 
         session["user_id"] = found_user.id
-        session["patient_id"] = 0
 
         if PatientInfo.query.filter_by(user_id=found_user.id).first():
                 session["role"] = "patient"
@@ -489,7 +496,7 @@ def apply_changes(consultation_id):
 
         db.session.commit()
 
-        return redirect(url_for("load_patient_result_page") )
+        return redirect(url_for("load_doctor_page") )
 
 
 @app.route('/download_attachment/<int:consultation_id>')  # downloads attachement to consultation

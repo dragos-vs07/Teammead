@@ -37,3 +37,7 @@ body{
     width : 500px;
       height : 500px ;
 }
+.upper_area{
+    display: flex;
+    flex-direction: row;
+}

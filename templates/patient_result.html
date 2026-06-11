@@ -76,44 +76,47 @@
 
         <h4> Consultations: </h4>
 
-        <div class ="consultation_container">
-            {% for c in consultations | reverse %}
+        <div class="upper_area">
             
-                <div class ="consultation_box">
-                    <p> date: {{ c.consultation_date.strftime("%d-%m-%Y") }} </p>
-                    <p> weight: {{c.weight}} </p>
-                    <p> diagnostic: {{c.diagnostic}} </p>
-                    <p> health state: {{c.health_state}} </p>
-                    {% if c.upload_file_path is not none %}
-                         <a href="{{ url_for('download_attachment', consultation_id = c.id ) }}">
-                            <button class ="download_button">
-                                Download Attachment
-                            </button>
-                        </a>
-                    {% endif %}
+                <div class ="consultation_container">
+                    {% for c in consultations | reverse %}
                     
-                    {% if c.doctor_user_id == session["user_id"] %}
-                    <a href ="{{ url_for('load_edit_consultation_page' , consultation_id = c.id ) }}"
-                        <button class ="edit_button">
-                            Edit
-                        </button>
-                     </a>
-                    {% endif %}
+                        <div class ="consultation_box">
+                            <p> date: {{ c.consultation_date.strftime("%d-%m-%Y") }} </p>
+                            <p> weight: {{c.weight}} </p>
+                            <p> diagnostic: {{c.diagnostic}} </p>
+                            <p> health state: {{c.health_state}} </p>
+                            {% if c.upload_file_path is not none %}
+                                <a href="{{ url_for('download_attachment', consultation_id = c.id ) }}">
+                                    <button class ="download_button">
+                                        Download Attachment
+                                    </button>
+                                </a>
+                            {% endif %}
+                            
+                            {% if c.doctor_user_id == session["user_id"] %}
+                            <a href ="{{ url_for('load_edit_consultation_page' , consultation_id = c.id ) }}"
+                                <button class ="edit_button">
+                                    Edit
+                                </button>
+                            </a>
+                            {% endif %}
+                        </div>
+                    <hr class ="between_consultations">
+                    {% endfor %}
                 </div>
-            <hr class ="between_consultations">
-            {% endfor %}
-        </div>
-            
-        <div class ="charts_area">
-
-                <canvas id ="weight_chart" class ="chart">
-
-                </canvas>
-
-                <canvas id ="health_state_chart" class ="chart">
                     
-                </canvas>
+                <div class ="charts_area">
 
+                        <canvas id ="weight_chart" class ="chart">
+
+                        </canvas>
+
+                        <canvas id ="health_state_chart" class ="chart">
+                            
+                        </canvas>
+
+                </div>
         </div>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>

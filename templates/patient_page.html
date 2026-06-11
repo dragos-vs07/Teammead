@@ -21,32 +21,45 @@
                             <div class ="small_header">
                                 <h3>MY CONSULTATIONS:</h3>
                             </div>
-                            
+
                             <br>
 
-                            <div class ="consultation_container">
+                            <div class ="upper_area">
 
-                                {% for c in patient.consultations | reverse %}
+                                    <div class ="consultation_container">
 
-                                    <div class ="consultation_box">
+                                        {% for c in consultations | reverse %}
 
-                                        <p> date: {{c.consultation_date}} </p>
-                                        <p> weight: {{c.weight}} </p>
-                                        <p> diagnostic: {{c.diagnostic}} </p>
-                                        <p> health state: {{c.health_state}} </p>
+                                            <div class ="consultation_box">
 
-                                        {% if c.upload_file_path is not none %}
-                                            <a href="{{ url_for('download_attachment', consultation_id = c.id) }}">
-                                                <button class ="download_button">
-                                                    download attachment
-                                                </button>
-                                            </a>
-                                        {% endif %}
+                                                <h4> {{c.consultation_date}} </h4>
+                                                <p><b> Weight </b> : {{c.weight}} </p>
+                                                <p> <b> Diagnostic </b> : {{c.diagnostic}} </p>
+                                                <p> <b> Health state </b> : {{c.health_state}} </p>
+                                                <p> <b> Doctor </b> : {{c.doctor_first_name.title()}} {{c.doctor_last_name.title()}}  </p>
+                                                <p> <b> Specialisation </b> : {{c.doctor_specialisation}}   </p>
+                                                {% if c.upload_file_path is not none %}
+                                                    <a href="{{ url_for('download_attachment', consultation_id = c.id) }}">
+                                                        <button class ="download_button">
+                                                            download attachment
+                                                        </button>
+                                                    </a>
+                                                {% endif %}
+
+                                            </div>
+
+                                        {% endfor %}
 
                                     </div>
 
-                                {% endfor %}
+                                    <div class ="charts_area">
+                                         <br>
+                                            <canvas id ="weight_chart" class ="chart"></canvas>
 
+                                         <br>
+                                                <canvas id ="health_state_chart" class ="chart"></canvas>
+                                         <br>
+                                     </div>
                             </div>
                             
                             <br>
@@ -73,7 +86,7 @@
                         <br>
                         <br>
                         
-                            </span><span class="second_half">Team</span><span class="third_half">med</span>
+                            <span class="second_half">Team</span><span class="third_half">med</span>
 
                         <br>
                         <br>
@@ -89,8 +102,10 @@
                     </div>
             </div>
             
-
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+            <script> const consultations_list = {{ consultations | tojson | safe }};</script>
             <script src = "{{ url_for('static' , filename = 'JavaScript/patient_page.js') }}"></script>
+
     </body>
 
 </html>
