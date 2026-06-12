@@ -24,6 +24,18 @@ class UserAuth(db.Model):
         active = db.Column(db.Boolean , nullable = False)
         update_date = db.Column(db.Date)
 
+        patient = db.relationship(
+                "PatientInfo" ,
+                back_populates ="user" ,
+                uselist=False
+        )
+
+        doctor = db.relationship(
+                "DoctorInfo" ,
+                back_populates ="user" ,
+                uselist=False
+        )
+
 
 class PatientInfo(db.Model):
        __tablename__ = "patient_info"
@@ -39,10 +51,15 @@ class PatientInfo(db.Model):
        update_date = db.Column(db.Date)
 
        consultations = db.relationship(
-       "ConsultationInfo" ,
-       back_populates = "patient" ,
-       order_by="ConsultationInfo.consultation_date.asc()"
+                "ConsultationInfo" ,
+                back_populates = "patient" ,
+                order_by="ConsultationInfo.consultation_date.asc()" ,
        )
+
+       user = db.relationship(
+                "UserAuth" ,
+                back_populates = "patient" ,
+        )
 
 class DoctorInfo(db.Model):
         __tablename__ = "doctor_info"
@@ -59,9 +76,14 @@ class DoctorInfo(db.Model):
         update_date = db.Column(db.Date)
 
         consultations = db.relationship(
-        "ConsultationInfo" ,
-        back_populates = "doctor" ,
-        order_by="ConsultationInfo.consultation_date.asc()"
+                "ConsultationInfo" ,
+                back_populates = "doctor" ,
+                order_by="ConsultationInfo.consultation_date.asc()" ,
+        )
+
+        user = db.relationship(
+                "UserAuth" ,
+                back_populates = "doctor" ,
         )
 
 
@@ -75,20 +97,20 @@ class ConsultationInfo(db.Model):
         health_state = db.Column(db.Integer)
         blood_pressure_systolic = db.Column(db.Integer) 
         blood_pressure_diastolic = db.Column(db.Integer)
-        heart_rate = db.Column(db.Integer)
         blood_oxygen_saturation = db.Column(db.Integer)  
+        heart_rate = db.Column(db.Integer)
         consultation_date = db.Column(db.Date , nullable = False )
         upload_file_path = db.Column(db.String(200))
         update_date = db.Column(db.Date)
 
         patient = db.relationship(
         "PatientInfo",
-        back_populates="consultations"
+        back_populates="consultations" ,
         )
 
         doctor = db.relationship(
         "DoctorInfo",
-        back_populates="consultations"
+        back_populates="consultations" ,
         )
 
 # =========================
@@ -105,6 +127,28 @@ def create_string_date( day , month , year):
 @app.route('/')
 def load_main_page():
         return render_template("index.html")
+
+@app.route('/patient_stats_page')
+def load_patient_stats_page():
+
+        if "user_id" not in session or session.get("role") != "patient": # can only be accessed from patient account 
+               return redirect(url_for("load_main_page"))
+        
+        user = db.session.get( UserAuth , session.get("user_id") )
+
+        print(user.id)
+        return render_template("patient_stats_page.html" ,
+                               consultations = [{
+                                        "diagnostic" : c.diagnostic ,
+                                        "weight" : c.weight ,
+                                        "health_state" : c.health_state ,
+                                        "blood_pressure_systolic" : c.blood_pressure_systolic ,
+                                        "blood_pressure_diastolic" : c.blood_pressure_diastolic ,
+                                        "blood_oxygen_saturation" : c.blood_oxygen_saturation ,
+                                        "heart_rate" : c.heart_rate ,
+                                        "consultation_date" : c.consultation_date ,
+                               } for c in user.patient.consultations]
+                               ) 
 
 @app.route('/edit_account')
 def load_edit_account_page(): # loads the edit account menu
@@ -207,6 +251,7 @@ def load_patient_result_page():
         if not patient_first_name or not patient_last_name :
                 flash("Must complete full name")
                 return redirect(url_for('load_doctor_page'))
+        
         query_patient = PatientInfo.query.filter_by(
                 first_name=patient_first_name.lower(),
                 last_name=patient_last_name.lower()
@@ -217,10 +262,6 @@ def load_patient_result_page():
                 return redirect(url_for('load_doctor_page'))
 
         session["patient_id"] = query_patient.id
-
-        if not query_patient :
-                flash("Patient doesnt exist")
-                return redirect(url_for('load_doctor_page'))
 
         return render_template(
             "patient_result.html",
@@ -237,7 +278,7 @@ def load_patient_result_page():
                 "health_state": c.health_state ,
                 "weight": c.weight ,
                 "blood_pressure_systolic" : c.blood_pressure_systolic ,
-                "blood_pressure_diastolic" : c.blood_pressure_systolic ,
+                "blood_pressure_diastolic" : c.blood_pressure_diastolic ,
                 "heart_rate" : c.heart_rate ,
                 "blood_oxygen_saturation" : c.blood_oxygen_saturation ,
                 "upload_file_path" : c.upload_file_path ,
@@ -446,9 +487,9 @@ def submit_consultation():
                 diagnostic=request.form.get("diagnostic"),
                 weight=request.form.get("weight"),
                 health_state=request.form.get("health_state"),
+                heart_rate = request.form.get("heart_rate") ,
                 blood_pressure_systolic = request.form.get("blood_pressure_systolic") ,
                 blood_pressure_diastolic = request.form.get("blood_pressure_diastolic") ,
-                heart_rate = request.form.get("heart_rate") ,
                 blood_oxygen_saturation = request.form.get("blood_oxygen_saturation")  ,
                 consultation_date=datetime.strptime(ConsultationDateString,"%d-%m-%Y").date() ,
                 doctor_id=doc.id,
@@ -483,9 +524,9 @@ def apply_changes(consultation_id):
         consultation.health_state = request.form.get("health_state")
         consultation.blood_pressure_systolic = request.form.get("blood_pressure_systolic") 
         consultation.blood_pressure_diastolic = request.form.get("blood_pressure_diastolic") 
+        consultation.blood_oxygen_saturation = request.form.get("blood_oxygen_saturation")  
         consultation.heart_rate = request.form.get("heart_rate") 
-        consultation.blood_oxygen_saturation = request.form.get("bloox_oxygen_saturation")  
-
+        
         day = request.form.get("day")
         month = request.form.get("month")
         year = request.form.get("year")
@@ -635,9 +676,8 @@ def deactivate_account():
         if check_password_hash( auth_entry.password , input_password ):
                 auth_entry.active = False
                 db.session.commit()
-                return jsonify({"success": True})
-        else:
-                return jsonify({"success": False})
+                session.clear()
+                return redirect(url_for("load_main_page"))
         
 @app.route('/logout')
 def logout():

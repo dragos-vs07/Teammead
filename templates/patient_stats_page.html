@@ -2,7 +2,7 @@
 
 <html>
     <head>
-        <link rel="stylesheet" href="{{ url_for('static', filename='CSS/patient_page.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='CSS/patient_stats_page.css') }}">
         <title>Teammed</title>
     </head>
     <body>
@@ -47,6 +47,21 @@
                             <button onclick = "logout_user()" class="sidebar_button" id="logout_button">Log out</button>
 
                     </div>
+
+                    <div class ="charts_area">
+
+                        <div class="chart"><canvas id="health_state_chart"></canvas></div>
+                        <div class="chart"><canvas id="weight_chart"></canvas></div>
+                        <div class="chart"><canvas id="blood_pressure_systolic_chart"></canvas></div>
+                        <div class="chart"><canvas id="blood_pressure_diastolic_chart"></canvas></div>
+                        <div class="chart"><canvas id="heart_rate_chart"></canvas></div>
+                        <div class="chart"><canvas id="blood_oxygen_saturation_chart"></canvas></div>
+
+                    </div>
+
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+                    <script> const consultations_list = {{ consultations | tojson | safe }};</script>
+                    <script src = "{{ url_for('static' , filename = 'JavaScript/patient_stats_page.js') }}"></script>
 
     </body>
 

@@ -56,6 +56,12 @@
                             <br>
                             <br>
 
+                            <label >Heart rate:</label>
+                            <input type ="number"  name="heart_rate" class ="input_box">
+
+                            <br>
+                            <br>
+                            
                             <label >Blood pressure:</label>
                             <input type ="number"  name="blood_pressure_systolic"    class ="input_box"> /
                             <input type ="number"  name="blood_pressure_diastolic"    class ="input_box">
@@ -89,6 +95,7 @@
                             <p> diagnostic: {{c.diagnostic}} </p>
                             <p> weight: {{c.weight}} </p>
                             <p> health state: {{c.health_state}} </p>
+                            <p> heart rate: {{c.heart_rate}}</p>
                             <p> blood pressure: {{c.blood_pressure_systolic}} / {{c.blood_pressure_diastolic}} </p>
                             <p> SpO<sub>2</sub>: {{c.blood_oxygen_saturation}} % </p>
                             {% if c.upload_file_path is not none %}
