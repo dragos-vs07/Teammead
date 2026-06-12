@@ -37,9 +37,11 @@
                                 <p> first name: {{c.patient.first_name}} </p>
                                 <p> last name: {{c.patient.last_name}} </p>
                                 <p> date: {{c.consultation_date.strftime("%d-%m-%Y")}} </p>
-                                <p> weight: {{c.weight}} </p>
                                 <p> diagnostic: {{c.diagnostic}} </p>
                                 <p> health state: {{c.health_state}} </p>
+                                <p> weight: {{c.weight}} </p>
+                                <p> blood pressure: {{c.blood_pressure_systolic}} / {{c.blood_pressure_diastolic}} </p>
+                                <p> SpO<sub>2</sub>: {{c.blood_oxygen_saturation}} % </p>
 
                                 {% if c.upload_file_path is not none %}
                                     <a href="{{ url_for('download_attachment', consultation_id = c.id) }}">

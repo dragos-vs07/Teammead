@@ -70,9 +70,13 @@ class ConsultationInfo(db.Model):
         id = db.Column(db.Integer , primary_key = True)
         doctor_id = db.Column(db.Integer, db.ForeignKey("doctor_info.id"))
         patient_id = db.Column(db.Integer, db.ForeignKey("patient_info.id"))
-        weight = db.Column(db.Integer)
         diagnostic = db.Column(db.String(50) , nullable = False )
+        weight = db.Column(db.Integer)
         health_state = db.Column(db.Integer)
+        blood_pressure_systolic = db.Column(db.Integer) 
+        blood_pressure_diastolic = db.Column(db.Integer)
+        heart_rate = db.Column(db.Integer)
+        blood_oxygen_saturation = db.Column(db.Integer)  
         consultation_date = db.Column(db.Date , nullable = False )
         upload_file_path = db.Column(db.String(200))
         update_date = db.Column(db.Date)
@@ -157,15 +161,12 @@ def load_patient_page():
                 first_name = user.first_name.title(),
                 last_name = user.last_name.title(),
                 patient = user ,
-                doctors = list({c.doctor for c in user.consultations}) ,
                 consultations = [{
-                        "id": c.id ,
-                "weight": c.weight,
+                "id": c.id ,
                 "diagnostic": c.diagnostic,
                 "consultation_date": c.consultation_date,
                 "health_state": c.health_state ,
                 "upload_file_path" : c.upload_file_path ,
-                "doctor_user_id" : c.doctor.user_id ,
                 "doctor_first_name": c.doctor.first_name ,
                 "doctor_last_name": c.doctor.last_name ,
                 "doctor_specialisation": c.doctor.specialisation 
@@ -231,10 +232,14 @@ def load_patient_result_page():
             phone_number=query_patient.phone_number,
             consultations=[{ # making the consultations dictionaries so we can convert them to json for the javascript part
                 "id": c.id ,
-                "weight": c.weight,
                 "diagnostic": c.diagnostic,
                 "consultation_date": c.consultation_date,
                 "health_state": c.health_state ,
+                "weight": c.weight ,
+                "blood_pressure_systolic" : c.blood_pressure_systolic ,
+                "blood_pressure_diastolic" : c.blood_pressure_systolic ,
+                "heart_rate" : c.heart_rate ,
+                "blood_oxygen_saturation" : c.blood_oxygen_saturation ,
                 "upload_file_path" : c.upload_file_path ,
                 "doctor_user_id" : c.doctor.user_id
             }
@@ -438,12 +443,16 @@ def submit_consultation():
         )
 
         new_consultation = ConsultationInfo(
-                weight=request.form.get("weight"),
                 diagnostic=request.form.get("diagnostic"),
+                weight=request.form.get("weight"),
+                health_state=request.form.get("health_state"),
+                blood_pressure_systolic = request.form.get("blood_pressure_systolic") ,
+                blood_pressure_diastolic = request.form.get("blood_pressure_diastolic") ,
+                heart_rate = request.form.get("heart_rate") ,
+                blood_oxygen_saturation = request.form.get("blood_oxygen_saturation")  ,
                 consultation_date=datetime.strptime(ConsultationDateString,"%d-%m-%Y").date() ,
                 doctor_id=doc.id,
                 patient_id=pat.id,
-                health_state=request.form.get("health_state"),
                 upload_file_path=file_path,
         )
 
@@ -472,7 +481,10 @@ def apply_changes(consultation_id):
         consultation.weight = request.form.get("weight")
         consultation.diagnostic = request.form.get("diagnostic")
         consultation.health_state = request.form.get("health_state")
-
+        consultation.blood_pressure_systolic = request.form.get("blood_pressure_systolic") 
+        consultation.blood_pressure_diastolic = request.form.get("blood_pressure_diastolic") 
+        consultation.heart_rate = request.form.get("heart_rate") 
+        consultation.blood_oxygen_saturation = request.form.get("bloox_oxygen_saturation")  
 
         day = request.form.get("day")
         month = request.form.get("month")

@@ -30,38 +30,41 @@
 
                         <form method ="POST" action ="/reg_consultation" enctype="multipart/form-data">
 
-                            <label >Weight:</label>
-                            <input type ="number"  name="weight">
-
-                            <br>
-                            <br>
-
-                            <label >Diagnostic:</label>
-                            <input type ="text"  name="diagnostic">
+                            <label>Diagnostic:</label>
+                            <input type ="text"  name="diagnostic" class ="input_box">
 
                             <br>
                             <br>
 
                             <label>Date:</label>
-                            
-                            <input type ="number"  name="day"  min="0"  max="31" placeholder ="day" >
-                            <input type ="number"  name="month"  min="1"  max="12" placeholder ="month" >
-                            <input type ="number"  name="year"  min="1900"  max="2026" placeholder ="year" >
-                            
+                            <input type ="number"  name="day"  min="0"  max="31" placeholder ="day"  class ="input_box">
+                            <input type ="number"  name="month"  min="1"  max="12" placeholder ="month"  class ="input_box">
+                            <input type ="number"  name="year"  min="1900"  max="2026" placeholder ="year"  class ="input_box">
+
+                            <br>
+                            <br>
+
+                            <label >Weight:</label>
+                            <input type ="number"  name="weight"  class ="input_box">
+
                             <br>
                             <br>
 
                             <label >Health state:</label>
-                            <input type ="number"  name="health_state" min = 0 max = 10>
+                            <input type ="number"  name="health_state" min = 0 max = 10   class ="input_box">
 
                             <br>
                             <br>
 
-                            <label> Attach Files: </label>
-                            <input type ="file" name="file">
+                            <label >Blood pressure:</label>
+                            <input type ="number"  name="blood_pressure_systolic"    class ="input_box"> /
+                            <input type ="number"  name="blood_pressure_diastolic"    class ="input_box">
 
                             <br>
                             <br>
+
+                            <label >SpO<sub>2:</label>
+                            <input type ="number"  name="blood_oxygen_saturation" min = 0 max = 100   class ="input_box">
                             
                             <button type ="submit">Submit</button>
                             
@@ -83,9 +86,11 @@
                     
                         <div class ="consultation_box">
                             <p> date: {{ c.consultation_date.strftime("%d-%m-%Y") }} </p>
-                            <p> weight: {{c.weight}} </p>
                             <p> diagnostic: {{c.diagnostic}} </p>
+                            <p> weight: {{c.weight}} </p>
                             <p> health state: {{c.health_state}} </p>
+                            <p> blood pressure: {{c.blood_pressure_systolic}} / {{c.blood_pressure_diastolic}} </p>
+                            <p> SpO<sub>2</sub>: {{c.blood_oxygen_saturation}} % </p>
                             {% if c.upload_file_path is not none %}
                                 <a href="{{ url_for('download_attachment', consultation_id = c.id ) }}">
                                     <button class ="download_button">

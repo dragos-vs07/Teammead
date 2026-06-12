@@ -8,140 +8,191 @@
 
     <body>
 
-        <h2> Edit your account authentification data</h2>
+        <div class ="content">
 
-        <form  method="POST" id = "submit_changes_form" onsubmit="return false;" class ="changes_form">   
-                <input type="text"  name="new_password"  placeholder = "New Password (optional)"  class ="input_box">
-                <br>
-                <br>
-                <input type="text"  name="new_email"  placeholder = "New Email" value = {{old_email}}  class ="input_box">
-                <br>
-                <br>
-                <button type = "button" class ="submit_changes_button" onclick = "open_password_change_window()">Submit changes</button>
-                <br>
-                <br>
-        </form>
-        
-        <div id = "old_password_required_window" >
+                        <div class = "sidebar">
 
-                <p>In order to change authentification data , please confirm your current password</p>
-                <input type="text" id ="old_password" placeholder ="Enter password">
-                <button onclick = "submit_password_change()">Confirm</button>
-                <button onclick = "close_password_change_window()">Cancel</button>
+                                    <div class ="logo">
+                                        <span class="second_half">Team</span><span class="third_half">med</span>
+                                    </div>
+
+                                    <br>
+                                    <br>
+
+                                        <button class="sidebar_button" onclick="window.location.href='/display_patient_stats'">
+                                            Statistics
+                                        </button>
+                                    
+                                    <br>
+                                    <br>
+
+
+                                        <button class="sidebar_button" onclick="window.location.href='/display_patient_appointments'">
+                                            Appointments
+                                        </button>
+
+                                    <br>
+                                    <br>
+
+                                        <button class="sidebar_button" onclick="window.location.href='/display_patient_consultations'">
+                                            Consultations
+                                        </button>
+                                    
+                                    <br>
+                                    <br>
+
+                                        <button class="sidebar_button"  onclick="window.location.href='/edit_account'">
+                                            Edit Account
+                                        </button>
+
+                                        <button onclick = "logout_user()" class="sidebar_button" id="logout_button">Log out</button>
+
+                        </div>
+                        
+                        <div class ="edit_panel">
+
+                            <div class="account_edit_box">
+
+                                    <h2> Edit your account authentification data</h2>
+
+                                    <form  method="POST" id = "submit_changes_form" onsubmit="return false;" class ="changes_form">   
+                                            <input type="text"  name="new_password"  placeholder = "New Password (optional)"  class ="input_box">
+                                            <br>
+                                            <br>
+                                            <input type="text"  name="new_email"  placeholder = "New Email" value = {{old_email}}  class ="input_box">
+                                            <br>
+                                            <br>
+                                            <button type = "button" class ="input_box" onclick = "open_password_change_window()"><strong>Submit changes</strong></button>
+                                            <br>
+                                            <br>
+                                    </form>
+                                    
+                                    <div id = "old_password_required_window" >
+
+                                            <p>In order to change authentification data , please confirm your current password</p>
+                                            <input type="text" id ="old_password" placeholder ="Enter password" class ="input_box">
+                                            <button onclick = "submit_password_change()" class ="input_box">Confirm</button>
+                                            <button onclick = "close_password_change_window()" class ="input_box">Cancel</button>
+                                    </div>
+                            </div>
+
+                            <div class="profile_edit_box">
+
+                                        <h2> Edit your profile </h2>
+
+                                        <form method = "POST" action ="/submit_changes_profile">
+
+                                                <label >Username:</label>
+                                                <input type ="text"  name="username" value = "{{old_username}}" class ="input_box">
+
+                                                <br>
+                                                <br>
+
+                                                <label >First Name:</label>
+                                                <input type ="text"  name="first_name" value = "{{old_first_name}}" class ="input_box">
+
+                                                <br>
+                                                <br>
+
+                                                <label >Last Name:</label>
+                                                <input type ="text"  name="last_name" value = "{{old_last_name}}" class ="input_box">
+
+                                                <br>
+                                                <br>
+
+                                                {% if session.get("role") == "doctor" %}
+                                                    <label> Specialisation: </label>
+                                                    <input type="text" name="specialisation"  value = "{{old_specialisation}}" class ="input_box">
+
+                                                    <br>
+                                                    <br>
+
+                                                    <label> Workplace adress: </label>
+                                                    <input type="text" name="adress"  value = "{{old_adress}}" class ="input_box">
+
+                                                    <br>
+                                                    <br>
+
+                                                    {% else %}
+
+                                                    <label>Home adress: </label>
+                                                    <input type="text" name="adress"  value = "{{old_adress}}" class ="input_box">
+
+                                                    <br>
+                                                    <br>
+
+                                                {% endif %}
+                                                
+
+                                                <label>Gender:</label>
+
+                                                <input
+
+                                                type ="radio"  
+                                                name="gender" 
+                                                value="male" 
+                                                {% if gender == "male" %} checked {% endif %}
+                                                >
+
+                                                Male
+                                                </label>
+
+                                                <label>
+
+                                                <input
+
+                                                type ="radio"  
+                                                name="gender" 
+                                                value="female" 
+                                                {% if gender == "female" %} checked {% endif %}
+                                                >
+
+                                                Female
+                                                </label>
+
+                                                <br>
+                                                <br>
+
+                                                <label> Phone number: </label>
+                                                <input type="text"  name="phone_number" value = {{old_phone_number}} class ="input_box">
+
+                                                <br>
+                                                <br>
+                                                
+                                                <label>Date of birth:</label>
+                                                <input type ="number"  name="day"  min="0"  max="31" placeholder ="day" value = {{old_day}} class ="input_box">
+                                                <input type ="number"  name="month"  min="1"  max="12" placeholder ="month" value = {{old_month}} class ="input_box">
+                                                <input type ="number"  name="year"  min="1900"  max="2026" placeholder ="year" value = {{old_year}} class ="input_box">
+
+                                                <br>
+                                                <br>
+
+                                                <button type ="submit" class ="input_box"><strong>Submit changes</strong></button>
+                                            </form>
+                                            
+                                                <br>
+                                                <br>
+
+                                            <button onclick = "open_confirm_window()" class ="deactivate_button">Deactivate account</button>
+                                </div>
+
+                                <div id ="confirm_window">
+                                        <p>Are you sure you want to deactivate your account?</p>
+                                        <p>All your appointments will be canceled and only an administrator can reactivate your account</p>
+
+                                        <input type="text" id="confirm_password" placeholder="Enter password">
+
+                                        <button onclick = "submit_deactivation()">Confirm</button>
+                                        <button onclick = "close_confirm_window()">Cancel</button>
+
+                                </div>
+
+                                {% for message in get_flashed_messages() %}
+                                    <p>{{message}}</p>
+                                {% endfor %}
+                    </div>
         </div>
-
-        <h2> Edit your profile </h2>
-
-        <form method = "POST" action ="/submit_changes_profile">
-
-                <label >Username:</label>
-                <input type ="text"  name="username" value = "{{old_username}}">
-
-                <br>
-                <br>
-
-                <label >First Name:</label>
-                <input type ="text"  name="first_name" value = "{{old_first_name}}">
-
-                <br>
-                <br>
-
-                <label >Last Name:</label>
-                <input type ="text"  name="last_name" value = "{{old_last_name}}" >
-
-                <br>
-                <br>
-
-                {% if session.get("role") == "doctor" %}
-                    <label> Specialisation: </label>
-                    <input type="text" name="specialisation"  value = "{{old_specialisation}}">
-
-                    <br>
-                    <br>
-
-                    <label> Workplace adress: </label>
-                    <input type="text" name="adress"  value = "{{old_adress}}">
-
-                    <br>
-                    <br>
-
-                    {% else %}
-
-                    <label>Home adress: </label>
-                    <input type="text" name="adress"  value = "{{old_adress}}">
-
-                    <br>
-                    <br>
-
-                {% endif %}
-                
-
-                <label>Gender:</label>
-
-                <input
-
-                type ="radio"  
-                name="gender" 
-                value="male" 
-                {% if gender == "male" %} checked {% endif %}
-                >
-
-                Male
-                </label>
-
-                <label>
-
-                <input
-
-                type ="radio"  
-                name="gender" 
-                value="female" 
-                {% if gender == "female" %} checked {% endif %}
-                >
-
-                Female
-                </label>
-
-                <br>
-                <br>
-
-                <label> Phone number: </label>
-                <input type="text"  name="phone_number" value = {{old_phone_number}}>
-
-                <br>
-                <br>
-                
-                <label>Date of birth:</label>
-                <input type ="number"  name="day"  min="0"  max="31" placeholder ="day" value = {{old_day}}>
-                <input type ="number"  name="month"  min="1"  max="12" placeholder ="month" value = {{old_month}}>
-                <input type ="number"  name="year"  min="1900"  max="2026" placeholder ="year" value = {{old_year}}>
-
-                <br>
-                <br>
-
-                <button type ="submit">Submit changes</button>
-            </form>
-            
-                <br>
-                <br>
-
-            <button onclick = "open_confirm_window()" class ="deactivate_button">Deactivate account</button>
-
-            <div id ="confirm_window">
-                    <p>Are you sure you want to deactivate your account?</p>
-                    <p>All your appointments will be canceled and only an administrator can reactivate your account</p>
-
-                    <input type="text" id="confirm_password" placeholder="Enter password">
-
-                    <button onclick = "submit_deactivation()">Confirm</button>
-                    <button onclick = "close_confirm_window()">Cancel</button>
-
-            </div>
-
-            {% for message in get_flashed_messages() %}
-                <p>{{message}}</p>
-            {% endfor %}
-            
+        
             <script src = "{{ url_for('static' , filename = 'JavaScript/account_edit_page.js') }}"></script>
     </body>
 
