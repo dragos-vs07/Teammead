@@ -60,19 +60,155 @@
                                 <option value="7">Last week</option>
                             </select>
                         </div>
-
-                        <div class="chart" id="health_state_chart"></div>
+                        <div></div> 
                         
+                        <div class="chart" id="health_state_chart"></div>
+                        <div class ="chart_stats_box" id="extremes_health">
+                        
+                            <div class ="min_max_box">
+                                 <strong><p class ="mean_tag">Max</p></strong>
+                                <div class ="max_item" id="max_health_state">{{ consultations | map(attribute="health_state") | max }}</div>
+                            </div>
+
+                            <div class ="mean_box" id="mean_health">
+                                <strong><p class ="mean_tag">Mean</p></strong>
+                                {% if consultations | length > 0 %}
+                                    {{ ( ( consultations | map(attribute="health_state") | sum ) / ( consultations | length) ) | round(1) }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </div>
+                            
+                            <div class ="min_max_box">
+                                 <strong><p class ="mean_tag">Min</p></strong>
+                                <div class ="min_item" id="min_health_state">{{ consultations | map(attribute="health_state") | min }}</div>
+                            </div>
+
+                        </div>
+
                         <div class="chart" id="weight_chart"></div>
-                         
+                        <div class ="chart_stats_box" id="extremes_weight">
+                        
+                            <div class ="min_max_box">
+                                <strong><p class ="mean_tag">Max</p></strong>
+                                <div class ="max_item" id="max_weight">{{ consultations | map(attribute="weight") | max }}</div>
+                                
+                            </div>
+
+                            <div class ="mean_box" id="mean_weight">
+                                <strong><p class ="mean_tag">Mean</p></strong>
+                                {% if consultations | length > 0 %}
+                                    {{ ( ( consultations | map(attribute="weight") | sum ) / ( consultations | length) ) | int }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </div>
+
+                            <div class ="min_max_box">
+                                <strong><p class ="mean_tag">Min</p></strong>
+                                 <div class ="min_item" id="min_weight">{{ consultations | map(attribute="weight") | min }}</div>
+                            </div>
+
+                        </div>
+
                         <div class="chart" id="blood_pressure_systolic_chart"></div>
-                         
+                        <div class ="chart_stats_box" id="extremes_bps">
+                        
+                            <div class ="min_max_box">
+                                <strong><p class ="mean_tag">Max</p></strong>
+                                <div class ="max_item" id="max_bps">{{ consultations | map(attribute="blood_pressure_systolic") | max }}</div>
+                            </div>
+
+                            <div class ="mean_box" id="mean_bps">
+                                <strong><p class ="mean_tag">Mean</p></strong>
+                                {% if consultations | length > 0 %}
+                                    {{ ( ( consultations | map(attribute="blood_pressure_systolic") | sum ) / ( consultations | length) ) | int }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </div>
+
+                            <div class ="min_max_box">
+                                 <strong><p class ="mean_tag">Min</p></strong>
+                                 <div class ="min_item" id="min_bps">{{ consultations | map(attribute="blood_pressure_systolic") | min }}</div>
+                            </div>
+
+                        </div>
+
                         <div class="chart" id="blood_pressure_diastolic_chart"></div>
-                         
+                        <div class ="chart_stats_box" id="extremes_bpd">
+                        
+                            <div class ="min_max_box">
+                                <strong><p class ="mean_tag">Max</p></strong>
+                                <div class ="max_item" id="max_bpd">{{ consultations | map(attribute="blood_pressure_diastolic") | max }}</div>
+
+                            </div>
+
+                            <div class ="mean_box" id="mean_bpd">
+                                <strong><p class ="mean_tag">Mean</p></strong>
+                                {% if consultations | length > 0 %}
+                                    {{ ( ( consultations | map(attribute="blood_pressure_diastolic") | sum ) / ( consultations | length) ) | int }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </div>
+
+                            <div class ="min_max_box">
+                                 <strong><p class ="mean_tag">Min</p></strong>
+                                <div class ="min_item" id="min_bpd">{{ consultations | map(attribute="blood_pressure_diastolic") | min }}</div>
+                            </div>
+
+                        </div>
+
                         <div class="chart" id="heart_rate_chart"></div>
-                         
+                        <div class ="chart_stats_box" id="extremes_heart_rate">
+
+                            <div class ="min_max_box">
+                                <strong><p class ="mean_tag">Max</p></strong>
+                                <div class ="max_item" id="max_heart_rate">{{ consultations | map(attribute="heart_rate") | max }}</div>
+                            </div>
+
+                            <div class ="mean_box" id="mean_heart_rate">
+                                <strong><p class ="mean_tag">Mean</p></strong>
+                                {% if consultations | length > 0 %}
+                                    {{ ( ( consultations | map(attribute="heart_rate") | sum ) / ( consultations | length) ) | round(1) }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </div>
+
+                            <div class ="min_max_box">
+                                 <strong><p class ="mean_tag">Min</p></strong>
+                               <div class ="min_item" id="min_heart_rate">{{ consultations | map(attribute="heart_rate") | min }}</div>
+                            </div>
+
+                        </div>
+
                         <div class="chart" id="blood_oxygen_saturation_chart"></div>
-                         
+                        <div class ="chart_stats_box" id="extremes_spo2">
+
+                            <div class ="min_max_box">
+                                <strong><p class ="mean_tag">Max</p></strong>
+                                <div class ="max_item" id="max_spo2">{{ consultations | map(attribute="blood_oxygen_saturation") | max }}</div>
+                            
+                            </div>
+
+                            <div class ="mean_box" id="mean_spo2">
+                                <strong><p class ="mean_tag">Mean</p></strong>
+                                {% if consultations | length > 0 %}
+                                    {{ ( ( consultations | map(attribute="blood_oxygen_saturation") | sum ) / ( consultations | length) ) | round(1) }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </div>
+
+                            <div class ="min_max_box">
+                                <strong><p class ="mean_tag">Min</p></strong>
+                                <div class ="min_item" id="min_spo2">{{ consultations | map(attribute="blood_oxygen_saturation") | min }}</div>
+                            </div>
+
+                        </div>
+                        </div>
 
                     </div>
                 
