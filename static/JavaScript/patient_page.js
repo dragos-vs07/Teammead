@@ -7,7 +7,8 @@ function redirect_to_doctor_page( doctor_id )
      window.location.href ="/find_doctor/" + doctor_id;
 }
 
-let xValues = consultations_list.map(c => {
+
+const consultation_dates = consultations_list.map(c => {
   const d = new Date(c.consultation_date);
   return d.toLocaleDateString('en-GB', {
     day: '2-digit',
@@ -16,48 +17,33 @@ let xValues = consultations_list.map(c => {
   });
 });
 
-yValues = consultations_list.map(c => c.health_state)
+const health_states = consultations_list.map(c => c.health_state)
 
-const health_state_canvas = document.getElementById("health_state_chart");
+Plotly.newPlot(
+     "health_state_chart" ,
+     [{   /* data */
+          x: consultation_dates ,
+          y: health_states ,
+          type: "scatter" ,
+          mode: "lines+markers",
+          name: "Weight" ,
+          line:{
+               shape: "spline" ,
+               smoothing: 1.3 ,
+               width: 3 ,
+               color: "#4FA1FF"
+          } , 
+          fill: "tozeroy" ,
+          fillcolor: "rgba(143,221,255,0.2)"
+     }] ,
+     {
+          xaxis : {
+               showgrid: false
+          } ,
 
-new Chart(health_state_canvas, {
-  type: "line",
-  data: {
-    labels: xValues,
-    datasets: [{
-      label: "Health state",
-      data: yValues,
-      borderColor: "#1565C0",
-      backgroundColor: "rgba(21, 101, 192, 0.08)",
-      fill: true,
-      tension: 0.4,
-      pointRadius: 3,
-      pointHoverRadius: 5,
-      pointBackgroundColor: "#1565C0",
-    }]
-  },
-  options: {
-    responsive: true,
-    legend: {
-      display: false
-    },
-    scales: {
-      yAxes: [{
-        ticks: {
-          beginAtZero: false,
-          maxTicksLimit: 4
-        },
-        gridLines: {
-          display: false,
-          drawBorder: false
-        }
-      }],
-      xAxes: [{
-        gridLines: {
-          display: false,
-          drawBorder: false
-        }
-      }]
-    }
-  }
-});
+          yaxis : {
+               showgrid: false ,
+               dtick: 2 ,
+          }
+     }
+)

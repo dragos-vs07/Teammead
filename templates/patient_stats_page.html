@@ -50,18 +50,39 @@
 
                     <div class ="charts_area">
 
-                        <div class="chart"><canvas id="health_state_chart"></canvas></div>
-                        <div class="chart"><canvas id="weight_chart"></canvas></div>
-                        <div class="chart"><canvas id="blood_pressure_systolic_chart"></canvas></div>
-                        <div class="chart"><canvas id="blood_pressure_diastolic_chart"></canvas></div>
-                        <div class="chart"><canvas id="heart_rate_chart"></canvas></div>
-                        <div class="chart"><canvas id="blood_oxygen_saturation_chart"></canvas></div>
+                        <div class ="filter_box">
+                            <select name="timerange" id="timerange">
+                                <option value="-1">All time</option>
+                                <option value="365">Last year</option>
+                                <option value="180">Last 6 months</option>
+                                <option value="90">Last 3 months</option>
+                                <option value="30">Last month</option>
+                                <option value="7">Last week</option>
+                            </select>
+                        </div>
+
+                        <div class="chart" id="health_state_chart"></div>
+                        
+                        <div class="chart" id="weight_chart"></div>
+                         
+                        <div class="chart" id="blood_pressure_systolic_chart"></div>
+                         
+                        <div class="chart" id="blood_pressure_diastolic_chart"></div>
+                         
+                        <div class="chart" id="heart_rate_chart"></div>
+                         
+                        <div class="chart" id="blood_oxygen_saturation_chart"></div>
+                         
 
                     </div>
-
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+                
+                 </div>
+                 
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
                     <script> const consultations_list = {{ consultations | tojson | safe }};</script>
                     <script src = "{{ url_for('static' , filename = 'JavaScript/patient_stats_page.js') }}"></script>
+            
+           
 
     </body>
 

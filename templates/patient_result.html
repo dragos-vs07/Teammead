@@ -120,18 +120,14 @@
                     
                 <div class ="charts_area">
 
-                        <canvas id ="weight_chart" class ="chart">
-
-                        </canvas>
-
-                        <canvas id ="health_state_chart" class ="chart">
-                            
-                        </canvas>
+                        <div id ="weight_chart" class ="chart"></div>
+                        
+                        <div id ="health_state_chart" class ="chart"></div>
 
                 </div>
         </div>
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
         <script> const consultations_list = {{ consultations | tojson | safe }};</script>
         <script src="{{ url_for('static', filename='JavaScript/patient_result.js') }}"></script>
     </body>

@@ -92,7 +92,7 @@
                                         <div class ="small_header">
                                             <h3>HEALTH STATE PROGRESS:</h3>
                                         </div>
-                                                <canvas id ="health_state_chart" class ="chart"></canvas>
+                                                <div id ="health_state_chart" class ="chart"></div>
                                      </div>
                             </div>
 
@@ -101,7 +101,7 @@
                     
             </div>
             
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+            <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
             <script> const consultations_list = {{ consultations | tojson | safe }};</script>
             <script src = "{{ url_for('static' , filename = 'JavaScript/patient_page.js') }}"></script>
 

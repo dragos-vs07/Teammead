@@ -1,4 +1,4 @@
-let xValues = consultations_list.map(c => {
+const consultation_dates = consultations_list.map(c => {
   const d = new Date(c.consultation_date);
   return d.toLocaleDateString('en-GB', {
     day: '2-digit',
@@ -7,52 +7,28 @@ let xValues = consultations_list.map(c => {
   });
 });
 
-let yValues = consultations_list.map(c => c.weight)
+const health_states = consultations_list.map(c => c.health_state)
 
-const weight_canvas = document.getElementById("weight_chart");
-
-new Chart(weight_canvas, {
-  type: "line",
-  data: {
-    labels: xValues,
-    datasets: [{
-      label: "Weight",
-      data: yValues,
-      borderColor: "#30E4FF",
-      tension: 0.3
+Plotly.newPlot(
+    "health_state_chart" ,
+    [{
+        x : consultation_dates,
+        y : health_states,
+        type: "scatter" ,
+        mode: "lines+markers",
+        name: "HealthState" 
     }]
-  },
-  options: {
-    responsive: true,
-    scales: {
-      y: {
-        beginAtZero: false
-      }
-    }
-  }
-});
+)
 
-yValues = consultations_list.map(c => c.health_state)
+const weights = consultations_list.map(c => c.weight)
 
-const health_state_canvas = document.getElementById("health_state_chart");
-
-new Chart(health_state_canvas, {
-  type: "line",
-  data: {
-    labels: xValues,
-    datasets: [{
-      label: "Health state",
-      data: yValues,
-      borderColor: "#30E4FF",
-      tension: 0.3
+Plotly.newPlot(
+    "weight_chart" ,
+    [{
+        x : consultation_dates,
+        y : weights,
+        type: "scatter" ,
+        mode: "lines+markers",
+        name: "Weight" 
     }]
-  },
-  options: {
-    responsive: true,
-    scales: {
-      y: {
-        beginAtZero: false
-      }
-    }
-  }
-});
+)

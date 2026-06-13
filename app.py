@@ -146,7 +146,7 @@ def load_patient_stats_page():
                                         "blood_pressure_diastolic" : c.blood_pressure_diastolic ,
                                         "blood_oxygen_saturation" : c.blood_oxygen_saturation ,
                                         "heart_rate" : c.heart_rate ,
-                                        "consultation_date" : c.consultation_date ,
+                                        "consultation_date" : c.consultation_date.strftime("%Y-%m-%d") ,
                                } for c in user.patient.consultations]
                                ) 
 
