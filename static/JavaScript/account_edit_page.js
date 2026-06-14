@@ -6,6 +6,10 @@ function close_confirm_window()
 {
     document.getElementById("confirm_window").style.display = "none";
 }
+function logout_user()
+{
+     window.location.href ="/logout";
+}
 function submit_deactivation()
 {
     const input_password = document.getElementById("confirm_password").value;

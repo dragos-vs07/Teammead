@@ -63,13 +63,6 @@ body{
     align-content: start;
     overflow-y: auto;
 }
-.max_item{
-    color: green;
-}
-.min_item{
-    color: red;
-    
-}
 .min_max_box{
     font-size: 30px;
     display: flex;

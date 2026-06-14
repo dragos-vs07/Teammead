@@ -2,11 +2,6 @@ function logout_user()
 {
      window.location.href ="/logout";
 }
-function redirect_to_doctor_page( doctor_id )
-{
-     window.location.href ="/find_doctor/" + doctor_id;
-}
-
 
 const consultation_dates = consultations_list.map(c => {
   const d = new Date(c.consultation_date);
