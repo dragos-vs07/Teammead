@@ -56,6 +56,12 @@ class PatientInfo(db.Model):
                 order_by="ConsultationInfo.consultation_date.asc()" ,
        )
 
+       appointments = db.relationship(
+                "AppointmentInfo" ,
+                back_populates = 'patient' ,
+                order_by="AppointmentInfo.appointment_date.asc()" ,
+        )
+
        user = db.relationship(
                 "UserAuth" ,
                 back_populates = "patient" ,
@@ -79,6 +85,12 @@ class DoctorInfo(db.Model):
                 "ConsultationInfo" ,
                 back_populates = "doctor" ,
                 order_by="ConsultationInfo.consultation_date.asc()" ,
+        )
+
+        appointments = db.relationship(
+                "AppointmentInfo" ,
+                back_populates = 'doctor' ,
+                order_by="AppointmentInfo.appointment_date.asc()" ,
         )
 
         user = db.relationship(
@@ -113,6 +125,25 @@ class ConsultationInfo(db.Model):
         back_populates="consultations" ,
         )
 
+class AppointmentInfo(db.Model):
+        __tablename__ = "appointment_info"
+        id = db.Column(db.Integer , primary_key = True)
+        doctor_id = db.Column(db.Integer, db.ForeignKey("doctor_info.id"))
+        patient_id = db.Column(db.Integer, db.ForeignKey("patient_info.id"))
+        appointment_date = db.Column(db.DateTime , nullable = False )
+        confirmation = db.Column(db.Integer , nullable = False) # -1 rejected , 0 pending , 1 accepted ( doctor does this )
+        status = db.Column(db.String(30) , nullable = False) # finished , cancelled , upcoming
+        update_date = db.Column(db.Date)
+        
+        patient = db.relationship(
+        "PatientInfo",
+        back_populates="appointments" ,
+        )
+
+        doctor = db.relationship(
+        "DoctorInfo",
+        back_populates="appointments" ,
+        )
 # =========================
 # HELPERS
 # =========================
@@ -128,6 +159,25 @@ def create_string_date( day , month , year):
 def load_main_page():
         return render_template("index.html")
 
+@app.route('/doctor_appointments_page')
+def load_doctor_appointments_page():
+         
+        if "user_id" not in session or session.get("role") != "doctor": # can only be accessed from doctor account 
+               return redirect(url_for("load_main_page"))
+        
+        user = UserAuth.query.filter_by(id = session["user_id"]).first()
+
+        return render_template(         "doctor_appointments_page.html" ,
+                                        pending_appointments = AppointmentInfo.query.filter_by(
+                                        doctor_id = user.doctor.id ,
+                                        confirmation = 0 ).all() , # appointments not accepted / rejected yet
+                                        
+                                        upcoming_appointments = AppointmentInfo.query.filter_by(
+                                        doctor_id = user.doctor.id ,
+                                        confirmation = 1 ,
+                                        status = "upcoming" ).all() # appointments accepted and that are on the way
+        )
+
 @app.route('/patient_stats_page')
 def load_patient_stats_page():
 
@@ -136,7 +186,6 @@ def load_patient_stats_page():
         
         user = db.session.get( UserAuth , session.get("user_id") )
 
-        print(user.id)
         return render_template("patient_stats_page.html" ,
                                consultations = [{
                                         "diagnostic" : c.diagnostic ,
@@ -149,6 +198,19 @@ def load_patient_stats_page():
                                         "consultation_date" : c.consultation_date.strftime("%Y-%m-%d") ,
                                } for c in user.patient.consultations]
                                ) 
+@app.route('/patient_consultations_page')
+def load_patient_consultations_page():
+         
+        if "user_id" not in session or session.get("role") != "patient": # can only be accessed from patient account 
+               return redirect(url_for("load_main_page"))
+          
+        user = db.session.get( UserAuth , session.get("user_id") )
+        return render_template("patient_consultations_page.html" ,
+                                user = user
+                              )
+@app.route('/patient_appointments_page')
+def load_patient_appointments_page():
+        return render_template("patient_appointments_page.html")
 
 @app.route('/edit_account')
 def load_edit_account_page(): # loads the edit account menu
@@ -165,8 +227,6 @@ def load_edit_account_page(): # loads the edit account menu
         else:
                 user_entry = PatientInfo.query.filter_by(user_id=session.get("user_id")).first()
                 
-        
-        
         return render_template(
                  "account_edit_page.html",
                    old_email=auth_entry.email,
@@ -451,6 +511,103 @@ def submit_login_data():
 # PATIENT + DOCTOR FEATURES
 # =========================
 
+@app.route('/submit_appointments_response' , methods =["POST"])
+def confirm_appointments():
+
+        if "user_id" not in session or session.get("role") != "doctor": # only doctor can access this
+               return redirect(url_for("load_main_page"))
+        
+        user = UserAuth.query.filter_by(id = session["user_id"]).first()
+
+        pending_appointments = AppointmentInfo.query.filter_by(
+        doctor_id = user.doctor.id ,
+        confirmation = 0 ).all()  # appointments not accepted / rejected yet
+
+        for ap in pending_appointments:
+                appointment_response = request.form.get(f"confirmation_{ap.id}")
+
+                if appointment_response : # if it isnt null then the user chose an option here and didnt ommit it
+                        if appointment_response == '1':
+                                ap.confirmation = 1
+                                ap.status = "upcoming"
+                        else:
+                                ap.confirmation = -1
+                                ap.status = "rejected"
+        
+        db.session.commit()
+        return redirect(url_for('load_doctor_appointments_page'))
+
+@app.route('/api/get_patient_appointments')
+def get_appointments():
+
+        if "user_id" not in session or session.get("role") != "patient": # only patient can access this
+               return jsonify({"status" : "failed"}) , 401
+        
+        user = UserAuth.query.filter_by(id = session["user_id"]).first()
+        valid_appointments = AppointmentInfo.query.filter_by( patient_id = user.patient.id , confirmation = 1)
+
+        return jsonify([
+                {
+                        "title" : f"Dr. {ap.doctor.first_name.title()} {ap.doctor.last_name.title()}" ,
+                        "start" : ap.appointment_date.isoformat() ,
+                        "id" : ap.id
+                }
+                for ap in valid_appointments
+        ])
+        
+@app.route( '/enquire_appointment' , methods = ["POST"] )
+def register_appointment():
+
+        if "user_id" not in session or session.get("role") != "patient": # only patient can access this
+                return redirect(url_for('load_main_page'))
+        
+        doc_first_name = request.form.get("first_name")
+        doc_last_name = request.form.get("last_name")
+
+        DoctorQuery = DoctorInfo.query.filter_by( first_name = doc_first_name.lower() , last_name = doc_last_name.lower() ).first()
+
+        if not DoctorQuery:
+                flash("Doctor doesnt exist")
+                return redirect(url_for("load_patient_appointments_page"))
+        
+        PatientQuery = PatientInfo.query.filter_by( user_id = session["user_id"] ).first()
+
+        year = request.form.get("year")
+        month = request.form.get("month")
+        day = request.form.get("day")
+        hour = request.form.get("hour")
+        minute = request.form.get("minute")
+
+        if not year:
+                year = 0
+
+        if not month:
+                month = 0
+
+        if not day:
+                day = 0
+
+        if not hour:
+                hour = 0
+
+        if not minute:
+                minute = 0
+
+        new_appointment = AppointmentInfo(
+                doctor_id = DoctorQuery.id ,
+                patient_id = PatientQuery.id ,
+                appointment_date = datetime( int(year),int(month),int(day),int(hour),int(minute) ) ,
+                confirmation = 0 ,
+                status = "upcoming" ,
+                update_date = date.today()
+        )
+
+        db.session.add(new_appointment)
+        db.session.commit()
+
+        return redirect(url_for("load_patient_appointments_page"))
+        
+
 @app.route('/reg_consultation' , methods=["POST"])  # adds new consultation to database
 def submit_consultation():
 
@@ -477,11 +634,9 @@ def submit_consultation():
                 file_path = os.path.join( folder_path , file.filename )
                 file.save(file_path)
 
-        ConsultationDateString = create_string_date( #birthday as a string
-            request.form.get("day"),
-            request.form.get("month"),
-            request.form.get("year")
-        )
+        year = request.form.get("year")
+        month = request.form.get("month")
+        day = request.form.get("day")
 
         new_consultation = ConsultationInfo(
                 diagnostic=request.form.get("diagnostic"),
@@ -491,10 +646,11 @@ def submit_consultation():
                 blood_pressure_systolic = request.form.get("blood_pressure_systolic") ,
                 blood_pressure_diastolic = request.form.get("blood_pressure_diastolic") ,
                 blood_oxygen_saturation = request.form.get("blood_oxygen_saturation")  ,
-                consultation_date=datetime.strptime(ConsultationDateString,"%d-%m-%Y").date() ,
+                consultation_date=datetime(year,month,day) ,
                 doctor_id=doc.id,
                 patient_id=pat.id,
                 upload_file_path=file_path,
+                update_date = date.today()
         )
 
         if not new_consultation.diagnostic :
@@ -526,7 +682,8 @@ def apply_changes(consultation_id):
         consultation.blood_pressure_diastolic = request.form.get("blood_pressure_diastolic") 
         consultation.blood_oxygen_saturation = request.form.get("blood_oxygen_saturation")  
         consultation.heart_rate = request.form.get("heart_rate") 
-        
+        consultation.update_date = date.today()
+
         day = request.form.get("day")
         month = request.form.get("month")
         year = request.form.get("year")
@@ -535,13 +692,7 @@ def apply_changes(consultation_id):
                 flash("Consultation date must be completed")
                 return redirect(url_for("load_edit_consultation_page", consultation_id=consultation_id))
 
-        ConsultationDateString = create_string_date( #birthday as a string
-            day ,
-            month ,
-            year
-        )
-
-        consultation.consultation_date = datetime.strptime(ConsultationDateString,"%d-%m-%Y").date() 
+        consultation.consultation_date = datetime(day,month,year) 
 
         if not consultation.diagnostic :
                 flash("Diagnostic must be completed")
@@ -581,11 +732,9 @@ def update_profile_data():
                 user_entry = PatientInfo.query.filter_by(user_id=session.get("user_id")).first()
                 
 
-        StringBday = create_string_date( #birthday as a string
-            request.form.get("day"),
-            request.form.get("month"),
-            request.form.get("year")
-        )
+        year = request.form.get("year")
+        month = request.form.get("month")
+        day = request.form.get("day")
 
         username = request.form.get("username")
         input_first_name = request.form.get("first_name")
@@ -608,7 +757,7 @@ def update_profile_data():
         user_entry.last_name = input_last_name.lower()
         user_entry.gender = request.form.get("gender")
         user_entry.phone_number = request.form.get("phone_number")
-        user_entry.birth_date = datetime.strptime(StringBday,"%d-%m-%Y").date()
+        user_entry.birth_date = date(year,month,day)
         user_entry.update_date = date.today()
         user_entry.adress = request.form.get("adress")
 

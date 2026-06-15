@@ -112,3 +112,12 @@ body{
 #logout_button{
    margin-top: auto;
 }
+.mean_item{
+    font-weight: bold;
+}
+.max_item{
+    font-weight: bold;
+}
+.min_item{
+    font-weight: bold;
+}

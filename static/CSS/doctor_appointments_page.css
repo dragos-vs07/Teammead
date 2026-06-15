@@ -57,29 +57,42 @@ body{
 }
 .right_side{
     padding-left: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.consultation_container{
-    
-    width: 50%;
-    height: 25rem;
-    border-style: solid;
-    border-color:rgb(86, 86, 86);
+.pending_ap_container{
+    padding: 10px;
+    border: 3px solid rgba(0, 0, 0, 0.25);
+    border-radius: 13px;
+}
+.upcoming_ap_container{
+    padding: 10px;
+    border: 3px solid rgba(0, 0, 0, 0.25);
+    border-radius: 13px;
+}
+.pending_ap_list{
+    width: 100%;
+    height: 15rem;
     overflow-y: auto;
 }
-.consultation_box{
-    padding-left: 10px;
+.upcoming_ap_list{
+    width: 100%;
+    height: 15rem;
+    overflow-y: auto;
 }
 .between_consultations{
     height: 5px;
     background-color:rgb(182, 178, 178);
 }
-.edit_button{
-    text-decoration: none;
-    background-color:rgb(169, 169, 169);
-    color: white;
-    cursor: pointer;
-    padding: 3px;
-    border-style: solid;
-    border-color:rgb(119, 119, 119);
-    border-radius: 2px;
+.ap_box{
+    padding-left: 5px;
+    background: rgba(21, 101, 192, 0.18);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-left-color: rgb(0, 73, 150);
+    border-left-style: solid;
+    border-left-width: 2px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
 }

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='CSS/patient_appointments_page.css') }}">
+        <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.10/index.global.min.css' rel='stylesheet'>
+        <title>Teammed</title>
+    </head>
+    <body>
+        
+        <div class ="content">
+                <div class = "sidebar">
+                                <div class ="logo">
+                                    <span class="second_half">Team</span><span class="third_half">med</span>
+                                </div>
+
+                                <br>
+                                <br>
+
+                                    <button class="sidebar_button" onclick="window.location.href='/patient_stats_page'">
+                                        Statistics
+                                    </button>
+                                
+                                <br>
+                                <br>
+
+                                    <button class="sidebar_button" onclick="window.location.href='/patient_appointments_page'">
+                                        Appointments
+                                    </button>
+
+                                <br>
+                                <br>
+
+                                    <button class="sidebar_button" onclick="window.location.href='/patient_consultations_page'">
+                                        Consultations
+                                    </button>
+                                
+                                <br>
+                                <br>
+
+                                    <button class="sidebar_button"  onclick="window.location.href='/edit_account'">
+                                        Edit Account
+                                    </button>
+
+                                    <button onclick = "logout_user()" class="sidebar_button" id="logout_button">Log out</button>
+
+                            </div>
+                            <div class="right_side">
+
+                                    <div class ="appointment_form">
+                                    <!-- patient fills in to send a query to make an appointment to the doctor-->
+                                            <form method ="POST" action ="/enquire_appointment">
+                                                    <label> Doctor first name:</label>
+                                                    <input type ="text" name="first_name" class ="input_box">
+                                                    
+                                                    <br>
+                                                    <br>
+
+                                                    <label> Doctor last name:</label>
+                                                    <input type ="text" name="last_name" class ="input_box">
+
+                                                    <br>
+                                                    <br>
+
+                                                    <label> Date: </label>
+                                                    <input type ="number"  name="day"  min="0"  max="31" placeholder ="day" class ="input_box">
+                                                    <input type ="number"  name="month"  min="1"  max="12" placeholder ="month"  class ="input_box">
+                                                    <input type ="number"  name="year"  min="1900"  max="2026" placeholder ="year"  class ="input_box">
+
+                                                    <br>
+                                                    <br>
+
+                                                    <label> Hour: </label>
+                                                    <input type ="number"  name="hour"  min="0"  max="23" placeholder ="hour" class ="input_box">
+                                                    <input type ="number"  name="minute"  min="0"  max="59" placeholder ="minute"  class ="input_box">
+
+                                                    <br>
+                                                    <br>
+
+                                                    <button type ="submit" class ="input_box"><strong>Submit appointment</strong></button>
+
+                                            </form>
+                                    </div>
+
+                                    <div id="calendar"></div>
+                                    
+                            </div>
+
+            </div>
+
+            {% for message in get_flashed_messages() %}
+                                <p>{{message}}</p>
+                            {% endfor %}
+
+            
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.10/index.global.min.js'></script>
+            <script src = "{{ url_for('static' , filename = 'JavaScript/patient_appointments_page.js') }}"></script>
+    </body>
+
+</html>

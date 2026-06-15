@@ -128,6 +128,7 @@ function updateStats(data) {
             maxEl.style.color = getColorForValue(maxVal, thresholds);
             minEl.style.color = getColorForValue(minVal, thresholds);
             meanEl.style.color = getColorForValue(meanVal , thresholds);
+
         }
     });
 }

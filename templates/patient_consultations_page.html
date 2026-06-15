@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='CSS/patient_consultations_page.css') }}">
+        <title>Teammed</title>
+    </head>
+    <body>
+        
+        <div class ="content">
+                <div class = "sidebar">
+                                <div class ="logo">
+                                    <span class="second_half">Team</span><span class="third_half">med</span>
+                                </div>
+
+                                <br>
+                                <br>
+
+                                    <button class="sidebar_button" onclick="window.location.href='/patient_stats_page'">
+                                        Statistics
+                                    </button>
+                                
+                                <br>
+                                <br>
+
+                                    <button class="sidebar_button" onclick="window.location.href='/patient_appointments_page'">
+                                        Appointments
+                                    </button>
+
+                                <br>
+                                <br>
+
+                                    <button class="sidebar_button" onclick="window.location.href='/patient_consultations_page'">
+                                        Consultations
+                                    </button>
+                                
+                                <br>
+                                <br>
+
+                                    <button class="sidebar_button"  onclick="window.location.href='/edit_account'">
+                                        Edit Account
+                                    </button>
+
+                                    <button onclick = "logout_user()" class="sidebar_button" id="logout_button">Log out</button>
+
+                            </div>
+
+                <div class = "right_side">
+
+
+                        <h3> My consultations </h3>
+
+                        <div class ="upper_area">
+                            <div class ="consultation_container">
+                                {% for c in user.patient.consultations | reverse %}
+                                    <div class ="consultation_box">
+                                
+                                        <p> first name: {{c.patient.first_name.title()}} </p>
+                                        <p> last name: {{c.patient.last_name.title()}} </p>
+                                        <p> date: {{c.consultation_date.strftime("%d-%m-%Y")}} </p>
+                                        <p> diagnostic: {{c.diagnostic}} </p>
+                                        <p> health state: {{c.health_state}} </p>
+                                        <p> heart rate: {{c.heart_rate}}</p>
+                                        <p> weight: {{c.weight}} </p>
+                                        <p> blood pressure: {{c.blood_pressure_systolic}} / {{c.blood_pressure_diastolic}} </p>
+                                        <p> SpO<sub>2</sub>: {{c.blood_oxygen_saturation}} % </p>
+
+                                        {% if c.upload_file_path is not none %}
+                                            <a href="{{ url_for('download_attachment', consultation_id = c.id) }}">
+                                                <button class ="download_button">
+                                                    download attachment
+                                                </button>
+                                            </a>
+                                        {% endif %}
+
+                                    </div>
+                                    <hr class ="between_consultations">
+                                {% endfor %}
+
+                            </div>
+
+                        </div>
+                        
+                </div>
+        </div>
+
+            <script src = "{{ url_for('static' , filename = 'JavaScript/patient_consultation_page.js') }}"></script>
+    </body>
+
+</html>

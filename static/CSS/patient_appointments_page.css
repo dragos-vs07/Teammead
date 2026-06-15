@@ -11,6 +11,12 @@ body{
     flex-direction: row;
     min-height: 100vh;
 }
+.right_side{
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 .logo{
     display: flex;
     justify-content: center;
@@ -55,31 +61,7 @@ body{
     padding: 3px;
     font-size: 2rem;
 }
-.right_side{
-    padding-left: 50px;
-}
-.consultation_container{
-    
-    width: 50%;
-    height: 25rem;
-    border-style: solid;
-    border-color:rgb(86, 86, 86);
-    overflow-y: auto;
-}
-.consultation_box{
-    padding-left: 10px;
-}
-.between_consultations{
-    height: 5px;
-    background-color:rgb(182, 178, 178);
-}
-.edit_button{
-    text-decoration: none;
-    background-color:rgb(169, 169, 169);
-    color: white;
-    cursor: pointer;
-    padding: 3px;
-    border-style: solid;
-    border-color:rgb(119, 119, 119);
-    border-radius: 2px;
+#calendar{
+    width: 650px;
+    height: 650px;
 }
