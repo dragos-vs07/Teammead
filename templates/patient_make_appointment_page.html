@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='CSS/patient_make_appointment_page.css') }}">
+        <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.10/index.global.min.css' rel='stylesheet'>
+        <title>Teammed</title>
+    </head>
+    <body>
+        
+        <div class ="content">
+                <div class = "sidebar">
+                                <div class ="logo">
+                                    <span class="second_half">Team</span><span class="third_half">med</span>
+                                </div>
+
+                                <br>
+                                <br>
+
+                                    <button class="sidebar_button" onclick="window.location.href='/patient_stats_page'">
+                                        Statistics
+                                    </button>
+                                
+                                <br>
+                                <br>
+
+                                    <button class="sidebar_button" onclick="window.location.href='/patient_appointments_page'">
+                                        Appointments
+                                    </button>
+
+                                <br>
+                                <br>
+
+                                    <button class="sidebar_button" onclick="window.location.href='/patient_consultations_page'">
+                                        Consultations
+                                    </button>
+                                
+                                <br>
+                                <br>
+
+                                    <button class="sidebar_button"  onclick="window.location.href='/edit_account'">
+                                        Edit Account
+                                    </button>
+
+                                    <button onclick = "logout_user()" class="sidebar_button" id="logout_button">Log out</button>
+
+                            </div>
+
+                            <div class="right_side">
+
+                                    <h2> Make an appointment for Dr. {{doctor.first_name.title()}} {{doctor.last_name.title()}} </h2>
+                                    
+                                    
+                            </div>
+
+            </div>
+
+            {% for message in get_flashed_messages() %}
+                <p>{{message}}</p>
+            {% endfor %}
+
+            
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.10/index.global.min.js'></script>
+            <script src = "{{ url_for('static' , filename = 'JavaScript/patient_make_appointment_page.js') }}"></script>
+    </body>
+
+</html>

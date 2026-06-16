@@ -47,7 +47,7 @@
                     </div>
                     <div class = "right_side">
 
-                        <div class ="pending_ap_container">
+                        <div class ="container">
 
                             <h3>Pending appointments</h3>
 
@@ -81,7 +81,7 @@
 
                         </div>
                         
-                        <div class ="upcoming_ap_container">
+                        <div class ="container">
 
                             <h3>Upcoming appointments</h3>
 
@@ -106,7 +106,79 @@
                             </div>
 
                         </div>
+
+                        <div class ="container">
+
+                                <h3>Edit general schedule</h3>
+                                <form method = "POST" action = "/submit_general_schedule">
+
+                                    {% set days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] %}
+
+                                    {% for day in days %}
+                                    {% set s = schedule[loop.index0] %}
+
+                                            <label>{{ day.title() }}:</label>
+
+                                            <input type="number" name="start_hour_{{day}}" min="0" max="23" placeholder="hour" class="input_box"
+                                                value="{{ s.start_time.hour if s.start_time else '' }}"> :
+                                            <input type="number" name="start_minute_{{day}}" min="0" max="59" placeholder="minute" class="input_box"
+                                                value="{{ s.start_time.minute if s.start_time else '' }}">
+
+                                            -
+
+                                            <input type="number" name="end_hour_{{day}}" min="0" max="23" placeholder="hour" class="input_box"
+                                                value="{{ s.end_time.hour if s.end_time else '' }}"> :
+                                            <input type="number" name="end_minute_{{day}}" min="0" max="59" placeholder="minute" class="input_box"
+                                                value="{{ s.end_time.minute if s.end_time else '' }}">
+
+                                            <br><br>
+                                    {% endfor %}
+
+                                    
+                                    <button type ="submit" class ="input_box"><strong>Submit schedule</strong></button>
+                                </form>
+                        </div>
+                        
+                        <div class ="container">
+
+                                <h3>Input unavailability period</h3>
                             
+                                <form method = "POST" action = "/submit_time_exception">
+
+
+                                    <label> Date: </label>
+
+                                    <input type ="number"  name="start_day_exception"  min="0"  max="31" placeholder ="day" class ="input_box">
+                                    <input type ="number"  name="start_month_exception"  min="1"  max="12" placeholder ="month"  class ="input_box">
+                                    <input type ="number"  name="start_year_exception"  min="1900"  max="2026" placeholder ="year"  class ="input_box">
+
+                                    -
+
+                                    
+                                    <input type ="number"  name="end_day_exception"  min="0"  max="31" placeholder ="day" class ="input_box">
+                                    <input type ="number"  name="end_month_exception"  min="1"  max="12" placeholder ="month"  class ="input_box">
+                                    <input type ="number"  name="end_year_exception"  min="1900"  max="2026" placeholder ="year"  class ="input_box">
+
+                                    <br>
+                                    <br>
+
+                                    <label> Hours: </label>
+
+                                    <input type ="number"  name="start_hour_exception"  min="0"  max="23" placeholder ="hour" class ="input_box"> :
+                                    <input type ="number"  name="start_minute_exception"  min="0"  max="59" placeholder ="minute"  class ="input_box">
+
+                                    -
+
+                                    <input type ="number"  name="end_hour_exception"  min="0"  max="23" placeholder ="hour" class ="input_box"> :
+                                    <input type ="number"  name="end_minute_exception"  min="0"  max="59" placeholder ="minute"  class ="input_box">
+
+                                    <br>
+                                    <br>
+
+                                    <button type ="submit" class ="input_box"><strong>Submit unavailability</strong></button>
+                                </form>
+                        </div>
+
                     </div>
 
         </div>

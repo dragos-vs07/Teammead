@@ -1,6 +1,6 @@
 from flask import Flask , render_template , request , flash , redirect , url_for , session , send_file , jsonify
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime , date
+from datetime import datetime , date , time
 from werkzeug.security import generate_password_hash , check_password_hash
 import os
 
@@ -144,6 +144,28 @@ class AppointmentInfo(db.Model):
         "DoctorInfo",
         back_populates="appointments" ,
         )
+
+class DoctorSchedule(db.Model): # stores the general schedule of each doctor 
+        __tablename__ = "doctor_schedule"
+        id = db.Column(db.Integer , primary_key = True)
+        doctor_id = db.Column(db.Integer, db.ForeignKey("doctor_info.id"))
+        day = db.Column(db.Integer) # 1 2 3 4 5 6 7 for each day in order
+        start_time = db.Column(db.Time) # starting hour of program
+        end_time = db.Column(db.Time) # closing hour
+
+# time slots are defined by their starting time , each consultation is assigned 30 mins
+# doctors can block time ranges and then if a patient tries booking an appointment for a time slot
+# that is contained by that blocked time range , he wont be allowed
+
+class DoctorException(db.Model): # stores blocked time segments where patients cant book an appointment
+        __tablename__ = "doctor_exception"
+        id = db.Column(db.Integer , primary_key = True)
+        doctor_id = db.Column(db.Integer, db.ForeignKey("doctor_info.id"))
+        start_date = db.Column(db.Date) # the starting date for the exception
+        end_date = db.Column(db.Date) # the end date for the exception
+        start_time = db.Column(db.Time) # starting time of the time range that is blocked
+        end_time = db.Column(db.Time) # end time of the time range that is blocked
+
 # =========================
 # HELPERS
 # =========================
@@ -167,6 +189,8 @@ def load_doctor_appointments_page():
         
         user = UserAuth.query.filter_by(id = session["user_id"]).first()
 
+        general_schedule = DoctorSchedule.query.filter_by(doctor_id = user.doctor.id).order_by(DoctorSchedule.day).all()
+
         return render_template(         "doctor_appointments_page.html" ,
                                         pending_appointments = AppointmentInfo.query.filter_by(
                                         doctor_id = user.doctor.id ,
@@ -175,7 +199,9 @@ def load_doctor_appointments_page():
                                         upcoming_appointments = AppointmentInfo.query.filter_by(
                                         doctor_id = user.doctor.id ,
                                         confirmation = 1 ,
-                                        status = "upcoming" ).all() # appointments accepted and that are on the way
+                                        status = "upcoming" ).all() , # appointments accepted and that are on the way
+
+                                        schedule = general_schedule
         )
 
 @app.route('/patient_stats_page')
@@ -197,7 +223,8 @@ def load_patient_stats_page():
                                         "heart_rate" : c.heart_rate ,
                                         "consultation_date" : c.consultation_date.strftime("%Y-%m-%d") ,
                                } for c in user.patient.consultations]
-                               ) 
+                               )
+ 
 @app.route('/patient_consultations_page')
 def load_patient_consultations_page():
          
@@ -208,9 +235,19 @@ def load_patient_consultations_page():
         return render_template("patient_consultations_page.html" ,
                                 user = user
                               )
+
 @app.route('/patient_appointments_page')
 def load_patient_appointments_page():
-        return render_template("patient_appointments_page.html")
+
+        if "user_id" not in session or session.get("role") != "patient": # can only be accessed from patient account 
+               return redirect(url_for("load_main_page"))
+        
+        user = UserAuth.query.filter_by( id = session["user_id"] ).first()
+
+        return render_template("patient_appointments_page.html" ,
+                               doctor_list =  DoctorInfo.query.all() ,
+                               appointments = AppointmentInfo.query.filter_by( patient_id = user.patient.id )
+                                )
 
 @app.route('/edit_account')
 def load_edit_account_page(): # loads the edit account menu
@@ -439,7 +476,7 @@ def submit_register_data():
                       update_date = date.today()
                )
                 db.session.add(new_doctor)
-
+                
         else:
                 new_patient = PatientInfo(
                       user_id = new_user.id,
@@ -454,6 +491,20 @@ def submit_register_data():
                 db.session.add(new_patient)
 
         db.session.commit()
+
+        if is_doctor == "on":
+
+                for i in range(7):
+                        new_schedule= DoctorSchedule(
+                        doctor_id=new_doctor.id,
+                        day=i+1,
+                        start_time=None,
+                        end_time=None
+                        )
+                        db.session.add(new_schedule)
+
+                db.session.commit()
+        
 
         flash("Account created succesfully")
         return redirect(url_for("load_register_page"))
@@ -510,6 +561,106 @@ def submit_login_data():
 # =========================
 # PATIENT + DOCTOR FEATURES
 # =========================
+
+@app.route('/patient_make_appointment_page/<int:doctor_id>')
+def load_patient_make_appointment_page(doctor_id):
+
+        if "user_id" not in session or session.get("role") != "patient": # only doctor can access this
+               return redirect(url_for("load_main_page"))
+        
+        return render_template("patient_make_appointment_page.html" ,
+                                doctor = DoctorInfo.query.filter_by(id = doctor_id).first() 
+                               )
+@app.route('/submit_time_exception' , methods =["POST"])
+def block_time_range():
+        
+        if "user_id" not in session or session.get("role") != "doctor": # only doctor can access this
+               return redirect(url_for("load_main_page"))
+        
+        user = UserAuth.query.filter_by(id = session["user_id"]).first()
+
+        day = request.form.get("start_day_exception")
+        month = request.form.get("start_month_exception")
+        year = request.form.get("start_year_exception")
+
+        start_date = date( int(day) , int(month) , int(year) )
+
+        day = request.form.get("end_day_exception")
+        month = request.form.get("end_month_exception")
+        year = request.form.get("end_year_exception")
+
+        end_date = date( int(day) , int(month) , int(year) )
+
+        hour = request.form.get("start_hour_exception")
+        minute =  request.form.get("start_minute_exception")
+
+        start_time = time( int(hour) , int(minute) )
+
+        hour = request.form.get("end_hour_exception")
+        minute =  request.form.get("end_minute_exception")
+
+        end_time = time( int(hour) , int(minute) )
+
+        new_time_range = DoctorException(
+                doctor_id = user.doctor.id ,
+                start_date = start_date ,
+                end_date = end_date ,
+                start_time = start_time ,
+                end_time = end_time 
+        )
+
+        db.session.add(new_time_range)
+        db.session.commit()
+
+@app.route('/submit_general_schedule' , methods =["POST"])
+def set_schedule():
+
+        if "user_id" not in session or session.get("role") != "doctor": # only doctor can access this
+               return redirect(url_for("load_main_page"))
+        
+        user = UserAuth.query.filter_by( id = session["user_id"] ).first()
+        
+        days_otw = [ "monday" , "tuesday" , "wednesday" , "thursday" , "friday" , "saturday" , "sunday" ]
+        
+        schedule_time_ranges = []
+
+        for day in days_otw:
+
+                start_hour = request.form.get(f"start_hour_{day}")
+                start_minute = request.form.get(f"start_minute_{day}")
+
+                end_hour = request.form.get(f"end_hour_{day}")
+                end_minute = request.form.get(f"end_minute_{day}")
+
+                if not start_hour:
+                        start_hour = '0'
+
+                if not start_minute:
+                        start_minute = '0'
+
+                if not end_hour:
+                        end_hour = '0'
+
+                if not end_minute:
+                        end_minute = '0'
+                
+                schedule_time_ranges.append( 
+                                ( 
+                                        time( int(start_hour), int(start_minute) ) ,
+                                        time( int(end_hour) , int(end_minute) ) 
+                                )  
+                        )
+
+        schedule = DoctorSchedule.query.filter_by( doctor_id = user.doctor.id ).order_by(DoctorSchedule.day).all()
+        # getting the schedule for each day of this doctor
+
+        for i, s in enumerate(schedule):
+                s.start_time = schedule_time_ranges[i][0]
+                s.end_time = schedule_time_ranges[i][1]
+        
+        db.session.commit()
+
+        return redirect(url_for('load_doctor_appointments_page'))
 
 @app.route('/submit_appointments_response' , methods =["POST"])
 def confirm_appointments():
@@ -646,7 +797,7 @@ def submit_consultation():
                 blood_pressure_systolic = request.form.get("blood_pressure_systolic") ,
                 blood_pressure_diastolic = request.form.get("blood_pressure_diastolic") ,
                 blood_oxygen_saturation = request.form.get("blood_oxygen_saturation")  ,
-                consultation_date=datetime(year,month,day) ,
+                consultation_date=datetime( int(year) , int(month) , int(day) ) ,
                 doctor_id=doc.id,
                 patient_id=pat.id,
                 upload_file_path=file_path,
