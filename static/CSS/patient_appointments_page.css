@@ -78,11 +78,31 @@ body{
     width: 25rem;
     height: 10rem;
 }
-.appointment_box{
+.appointment_box_1{
     background: rgba(21, 101, 192, 0.18);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-left-color: rgb(0, 73, 150);
+    border-left-style: solid;
+    border-left-width: 2px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+.appointment_box_0{
+    background: rgba(115, 116, 116, 0.18);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-left-color: rgb(72, 76, 80);
+    border-left-style: solid;
+    border-left-width: 2px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+.appointment_box_-1{
+    background: rgba(221, 38, 28, 0.18);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-left-color: rgb(150, 15, 0);
     border-left-style: solid;
     border-left-width: 2px;
     border-top-right-radius: 10px;

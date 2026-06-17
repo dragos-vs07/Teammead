@@ -77,9 +77,39 @@ body{
     border: 3px solid rgba(0, 0, 0, 0.25);
 }
 .panel_content{
+    
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     padding: 10px;
+}
+.time_segments_container{
+    height: 20rem;
+    width: 15rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.time_segments_container > div {
+    height: 100%;
+    flex-direction : column;
+    gap : 5px;
+    overflow-y: auto;
+}
+#make_appointment_button{
+    display: none;
+}
+#modal_box{
+    gap: 5px;
+    padding: 10px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 3px solid rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+    background-color: white;
+    display: none;
+    position: fixed;
+    z-index: 1000;
 }

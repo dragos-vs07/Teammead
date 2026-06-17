@@ -131,7 +131,7 @@ class AppointmentInfo(db.Model):
         id = db.Column(db.Integer , primary_key = True)
         doctor_id = db.Column(db.Integer, db.ForeignKey("doctor_info.id"))
         patient_id = db.Column(db.Integer, db.ForeignKey("patient_info.id"))
-        appointment_date = db.Column(db.DateTime , nullable = False )
+        appointment_date = db.Column(db.DateTime , nullable = False ) # stores date and time segment at which it starts ( time can only be xx:00 or xx:30 )
         confirmation = db.Column(db.Integer , nullable = False) # -1 rejected , 0 pending , 1 accepted ( doctor does this )
         status = db.Column(db.String(30) , nullable = False) # finished , cancelled , upcoming
         update_date = db.Column(db.Date)
@@ -247,7 +247,7 @@ def load_patient_appointments_page():
 
         return render_template("patient_appointments_page.html" ,
                                doctor_list =  DoctorInfo.query.all() ,
-                               appointments = AppointmentInfo.query.filter_by( patient_id = user.patient.id )
+                               appointments = AppointmentInfo.query.filter_by( patient_id = user.patient.id ,  ).all()
                                 )
 
 @app.route('/edit_account')
@@ -781,42 +781,16 @@ def register_appointment():
         if "user_id" not in session or session.get("role") != "patient": # only patient can access this
                 return redirect(url_for('load_main_page'))
         
-        doc_first_name = request.form.get("first_name")
-        doc_last_name = request.form.get("last_name")
-
-        DoctorQuery = DoctorInfo.query.filter_by( first_name = doc_first_name.lower() , last_name = doc_last_name.lower() ).first()
-
-        if not DoctorQuery:
-                flash("Doctor doesnt exist")
-                return redirect(url_for("load_patient_appointments_page"))
+        data = request.get_json()
         
         PatientQuery = PatientInfo.query.filter_by( user_id = session["user_id"] ).first()
 
-        year = request.form.get("year")
-        month = request.form.get("month")
-        day = request.form.get("day")
-        hour = request.form.get("hour")
-        minute = request.form.get("minute")
-
-        if not year:
-                year = 0
-
-        if not month:
-                month = 0
-
-        if not day:
-                day = 0
-
-        if not hour:
-                hour = 0
-
-        if not minute:
-                minute = 0
+        print(data['date'])
 
         new_appointment = AppointmentInfo(
-                doctor_id = DoctorQuery.id ,
+                doctor_id = data["doctor_id"] ,
                 patient_id = PatientQuery.id ,
-                appointment_date = datetime( int(year),int(month),int(day),int(hour),int(minute) ) ,
+                appointment_date = datetime.strptime( f"{data['date']}" , "%Y-%m-%d %H:%M:%S") ,
                 confirmation = 0 ,
                 status = "upcoming" ,
                 update_date = date.today()
@@ -825,7 +799,9 @@ def register_appointment():
         db.session.add(new_appointment)
         db.session.commit()
 
-        return redirect(url_for("load_patient_appointments_page"))
+        return jsonify({
+                "status" : "success"
+        })
         
 
 @app.route('/reg_consultation' , methods=["POST"])  # adds new consultation to database

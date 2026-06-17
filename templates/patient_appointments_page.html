@@ -74,10 +74,20 @@
                                                     <div class ="appointments_list">
 
                                                         {% for ap in appointments %}
-                                                                <div class ="appointment_box">
+                                                                <div class ="appointment_box_{{ap.confirmation}}">
                                                                         <p>Dr. {{ap.doctor.first_name.title()}} {{ap.doctor.last_name.title()}}</p>
-                                                                        <p>{{ap.doctor.specialisation.title()}}</p>
+                                                                        {% if ap.doctor.specialisation %}
+                                                                         <p>{{ap.doctor.specialisation.title()}}</p>
+                                                                        {% endif %}
                                                                         <p>{{ap.appointment_date}}</p>
+
+                                                                        {% if ap.confirmation == 1 %}
+                                                                            <p>Confirmed</p>
+                                                                        {% elif ap.confirmation == 0 %}
+                                                                            <p>Pending</p>
+                                                                        {% else %}
+                                                                            <p>Rejected</p>
+                                                                        {% endif %}
                                                                 </div>
                                                         {% endfor %}
 

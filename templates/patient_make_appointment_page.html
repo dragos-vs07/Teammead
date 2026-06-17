@@ -55,6 +55,7 @@
                                     </div>
 
                                     <div id="appointment_panel">
+
                                             <div class ="panel_content">
 
                                                 <div id ="main_text"></div>
@@ -65,13 +66,24 @@
                                                        {% for day in range(0,7) %}
                                                             <div id = "{{day}}_segments" style ="display:none" >
                                                                     {% for segment in time_segments[ day ] %}
-                                                                        <button type="button">{{segment}}</button>
+                                                                        <button type="button" class = "time_segment_button"  onclick ="selectTimeSegment(this)">{{segment}}</button>
                                                                     {% endfor %}
                                                             </div>
                                                        {% endfor %}
                                                 </div>
+
+                                                <button type="button" id = "make_appointment_button" onclick = "showConfirmBox()">Make appointment</button>
+
                                             </div>
                                     </div>
+
+                                    
+                    <div id="modal_box">
+                        <p id="modal_text">Confirm appointment?</p>
+                        <button onclick="submitAppointment()">Confirm</button>
+                        <button onclick="closeModal()">Cancel</button>
+                    </div>
+</div>
                             </div>
 
             </div>
