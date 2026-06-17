@@ -48,9 +48,30 @@
 
                             <div class="right_side">
 
-                                    <h2> Make an appointment for Dr. {{doctor.first_name.title()}} {{doctor.last_name.title()}} </h2>
-                                    
-                                    
+                                    <div class ="calendar_container">
+                                        <h2> Make an appointment with Dr. {{doctor.first_name.title()}} {{doctor.last_name.title()}} </h2>
+                                        
+                                        <div id="calendar"></div> <!-- display the chosen doctors' schedule -->
+                                    </div>
+
+                                    <div id="appointment_panel">
+                                            <div class ="panel_content">
+
+                                                <div id ="main_text"></div>
+
+                                                <br>
+                                                
+                                                <div class ="time_segments_container">
+                                                       {% for day in range(0,7) %}
+                                                            <div id = "{{day}}_segments" style ="display:none" >
+                                                                    {% for segment in time_segments[ day ] %}
+                                                                        <button type="button">{{segment}}</button>
+                                                                    {% endfor %}
+                                                            </div>
+                                                       {% endfor %}
+                                                </div>
+                                            </div>
+                                    </div>
                             </div>
 
             </div>
@@ -59,7 +80,7 @@
                 <p>{{message}}</p>
             {% endfor %}
 
-            
+            <script>const doctorId = {{ doctor.id }}; </script>
             <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.10/index.global.min.js'></script>
             <script src = "{{ url_for('static' , filename = 'JavaScript/patient_make_appointment_page.js') }}"></script>
     </body>

@@ -1,6 +1,7 @@
 from flask import Flask , render_template , request , flash , redirect , url_for , session , send_file , jsonify
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime , date , time
+from datetime import datetime , date , time , timedelta
+from dateutil.parser import parse
 from werkzeug.security import generate_password_hash , check_password_hash
 import os
 
@@ -311,7 +312,7 @@ def load_patient_page():
                 "doctor_first_name": c.doctor.first_name ,
                 "doctor_last_name": c.doctor.last_name ,
                 "doctor_specialisation": c.doctor.specialisation 
-                } for c in user.consultations[:3] ]
+                } for c in user.consultations[-3:] ]
         )
 
 
@@ -406,6 +407,32 @@ def load_doctor_result_page(doctor_id):
                 phone_number = doctor.phone_number ,
                 adress = doctor.adress             
         )
+
+@app.route('/patient_make_appointment_page/<int:doctor_id>')
+def load_patient_make_appointment_page(doctor_id):
+
+        if "user_id" not in session or session.get("role") != "patient": # only doctor can access this
+               return redirect(url_for("load_main_page"))
+        
+        segment_dict = {i: [] for i in range(0, 7)} # stores valid time segments for each day of the week
+
+        schedule = DoctorSchedule.query.filter_by(doctor_id = doctor_id).all()
+
+        for s in schedule:
+
+                if s.start_time :
+
+                        current_time = datetime.combine( datetime.today() , s.start_time )
+                        end_time = datetime.combine( datetime.today() , s.end_time )
+
+                        while current_time < end_time:
+                                segment_dict[s.day].append(current_time)
+                                current_time += timedelta( minutes = 30 )
+
+        return render_template("patient_make_appointment_page.html" ,
+                                doctor = DoctorInfo.query.filter_by(id = doctor_id).first() ,
+                                time_segments = segment_dict 
+                               )
 # =========================
 # REGISTER
 # =========================
@@ -497,7 +524,7 @@ def submit_register_data():
                 for i in range(7):
                         new_schedule= DoctorSchedule(
                         doctor_id=new_doctor.id,
-                        day=i+1,
+                        day=i,
                         start_time=None,
                         end_time=None
                         )
@@ -562,15 +589,6 @@ def submit_login_data():
 # PATIENT + DOCTOR FEATURES
 # =========================
 
-@app.route('/patient_make_appointment_page/<int:doctor_id>')
-def load_patient_make_appointment_page(doctor_id):
-
-        if "user_id" not in session or session.get("role") != "patient": # only doctor can access this
-               return redirect(url_for("load_main_page"))
-        
-        return render_template("patient_make_appointment_page.html" ,
-                                doctor = DoctorInfo.query.filter_by(id = doctor_id).first() 
-                               )
 @app.route('/submit_time_exception' , methods =["POST"])
 def block_time_range():
         
@@ -687,6 +705,57 @@ def confirm_appointments():
         
         db.session.commit()
         return redirect(url_for('load_doctor_appointments_page'))
+
+@app.route('/api/get_doctor_schedule/<int:doctor_id>/<start_view>/<end_view>')
+def get_schedule( doctor_id , start_view , end_view ):
+
+        if "user_id" not in session : 
+               return jsonify({"status" : "failed"}) , 401
+        
+        schedule = DoctorSchedule.query.filter_by( doctor_id = doctor_id ).all()
+
+        schedule_days = []
+
+        for s in schedule:
+                schedule_days.append( ( s.start_time , s.end_time ) )
+
+        start_view_date = parse(start_view).date()
+        end_view_date = parse(end_view).date()
+
+        events = []
+
+        current_day = start_view_date
+        day_num = start_view_date.isoweekday()-1
+
+        while current_day <= end_view_date:
+
+                st = schedule_days[day_num][0]
+                et = schedule_days[day_num][1]
+                
+                if st != time(0,0,0) and current_day >= date.today()  : # if the doctor input anything in start time means he has a program on this day
+                        events.append({
+                                "title" : f"{st}-{et}" ,
+                                "start" : f"{current_day}" ,
+                                "display" : "background" ,
+                                "backgroundColor" : "rgba(43, 165, 217,0.75)"  ,
+                                "extendedProps" : {
+                                    "type" : 1
+                                 }
+                        })
+                else :
+                        events.append({
+                                "title" : "Unavailable" ,
+                                "start" : f"{current_day}" ,
+                                "display" : "background" ,
+                                "backgroundColor" : "rgba(245, 39, 39,0.75)" ,
+                        })
+
+                current_day += timedelta(days=1)
+                day_num = ( day_num + 1 ) % 7
+
+
+        return jsonify(events)
+
 
 @app.route('/api/get_patient_appointments')
 def get_appointments():
