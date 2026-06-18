@@ -194,6 +194,7 @@ def load_doctor_appointments_page():
         general_schedule = DoctorSchedule.query.filter_by(doctor_id = user.doctor.id).order_by(DoctorSchedule.day).all()
 
         return render_template(         "doctor_appointments_page.html" ,
+                                        current_datetime = datetime.now().strftime("%Y-%m-%dT%H:%M") ,
                                         pending_appointments = AppointmentInfo.query.filter_by(
                                         doctor_id = user.doctor.id ,
                                         confirmation = 0 ).all() , # appointments not accepted / rejected yet
@@ -633,47 +634,15 @@ def block_time_range():
         
         user = UserAuth.query.filter_by(id = session["user_id"]).first()
 
-        day = request.form.get("start_day_exception")
-        month = request.form.get("start_month_exception")
-        year = request.form.get("start_year_exception")
-
-        start_date = date(int(year), int(month), int(day))
-
-        day = request.form.get("end_day_exception")
-        month = request.form.get("end_month_exception")
-        year = request.form.get("end_year_exception")
-
-        end_date = date(int(year), int(month), int(day))
-
-
-        hour = request.form.get("start_hour_exception")
-        minute =  request.form.get("start_minute_exception")
-
-        if not minute:
-                minute = 0
-
-        if not hour:
-                hour = 0
-
-        start_time = time( int(hour) , int(minute) )
-
-        hour = request.form.get("end_hour_exception")
-        minute =  request.form.get("end_minute_exception")
-
-        if not minute:
-                minute = 0
-
-        if not hour:
-                hour = 0
-
-        end_time = time( int(hour) , int(minute) )
+        start_date = request.form.get("start_date")
+        end_date = request.form.get("end_date")
 
         new_time_range = DoctorException(
                 doctor_id = user.doctor.id ,
-                start_date = start_date ,
-                end_date = end_date ,
-                start_time = start_time ,
-                end_time = end_time ,
+                start_date = start_date.date() ,
+                end_date = end_date.date() ,
+                start_time = start_date.time() ,
+                end_time = end_date.time() ,
                 source = "doctor"
         )
 
@@ -695,38 +664,15 @@ def set_schedule():
         schedule_time_ranges = []
 
         for day in days_otw:
-
-                start_hour = request.form.get(f"start_hour_{day}")
-                start_minute = request.form.get(f"start_minute_{day}")
-
-                end_hour = request.form.get(f"end_hour_{day}")
-                end_minute = request.form.get(f"end_minute_{day}")
-
-                if not start_hour:
-                        start_hour = '0'
-
-                if not start_minute:
-                        start_minute = '0'
-
-                if not end_hour:
-                        end_hour = '0'
-
-                if not end_minute:
-                        end_minute = '0'
-                
-                schedule_time_ranges.append( 
-                                ( 
-                                        time( int(start_hour), int(start_minute) ) ,
-                                        time( int(end_hour) , int(end_minute) ) 
-                                )  
-                        )
+                schedule_time_ranges.append( ( request.form.get(f"start_time_{day}") , request.form.get(f"end_time_{day}") )  )
 
         schedule = DoctorSchedule.query.filter_by( doctor_id = user.doctor.id ).order_by(DoctorSchedule.day).all()
         # getting the schedule for each day of this doctor
 
         for i, s in enumerate(schedule):
-                s.start_time = schedule_time_ranges[i][0]
-                s.end_time = schedule_time_ranges[i][1]
+
+                s.start_time = datetime.strptime(schedule_time_ranges[i][0],"%H:%M").time()
+                s.end_time = datetime.strptime(schedule_time_ranges[i][1],"%H:%M").time()
         
         db.session.commit()
 
@@ -863,12 +809,33 @@ def register_appointment():
         data = request.get_json()
         
         PatientQuery = PatientInfo.query.filter_by( user_id = session["user_id"] ).first()
+        exceptions = DoctorException.query.filter_by(doctor_id = data["doctor_id"])
+
+        ap_date = datetime.strptime( f"{data['date']}" , "%Y-%m-%d %H:%M:%S")
+        
+        ERROR_MESSAGE = jsonify({
+                "status": "error",
+                "message": "Appointment falls within an unavailable period"
+                })
+        
+        for e in exceptions:
+                if  e.start_date < e.end_date :
+                        if e.start_date < ap_date.date() and ap_date.date() < e.end_date : 
+                                return ERROR_MESSAGE , 400;
+                        elif e.start_date == ap_date.date() and e.start_time <= ap_date.time() : 
+                                return ERROR_MESSAGE , 400;
+                        elif e.end_date == ap_date.date() and  ap_date.time() <= e.end_time :
+                                return ERROR_MESSAGE , 400;     
+                elif e.start_date == ap_date.date() : 
+                    if e.start_time <= ap_date.time() and ap_date.time() <= e.end_time:
+                         return ERROR_MESSAGE , 400;
+          
 
         print("HERE:" , data['date'])
         new_appointment = AppointmentInfo(
                 doctor_id = data["doctor_id"] ,
                 patient_id = PatientQuery.id ,
-                appointment_date = datetime.strptime( f"{data['date']}" , "%Y-%m-%d %H:%M:%S") ,
+                appointment_date = ap_date ,
                 confirmation = 0 ,
                 status = "upcoming" ,
                 update_date = date.today()
