@@ -6,8 +6,8 @@ function logout_user()
 /* helper */
 
 function getMean(arr, field) {
-    if (arr.length === 0) return "N/A";
-    const values = arr.map(c => c[field]);
+    const values = arr.map(c => c[field]).filter(v => v !== null && v !== '' && v !== undefined);
+    if (values.length === 0) return "N/A";
     return (values.reduce((sum, v) => sum + v, 0) / values.length).toFixed(2);
 }
 
@@ -76,10 +76,10 @@ const statFields = [
 const idSuffix = {
     health_state: "health_state",
     weight: "weight",
-    blood_pressure_systolic: "bps",
-    blood_pressure_diastolic: "bpd",
+    blood_pressure_systolic: "blood_pressure_systolic",
+    blood_pressure_diastolic: "blood_pressure_diastolic",
     heart_rate: "heart_rate",
-    blood_oxygen_saturation: "spo2"
+    blood_oxygen_saturation: "blood_oxygen_saturation"
 };
 
 const unitSuffix = {
@@ -96,21 +96,20 @@ const unitSuffix = {
 function updateStats(data) {
     statFields.forEach(({ key, thresholds }) => {
         const suffix = idSuffix[key];
-        const values = data.map(c => c[key]);
+        const values = data.map(c => c[key]).filter(v => v !== null && v !== '' && v !== undefined);
 
         const maxEl = document.getElementById(`max_${suffix}`);
         const minEl = document.getElementById(`min_${suffix}`);
         const meanEl = document.getElementById(`mean_${suffix}`);
 
-        if (data.length === 0) {
+        if (values.length === 0) {
             maxEl.textContent = "N/A";
             minEl.textContent = "N/A";
             meanEl.textContent = "N/A";
-
-            // reset to default color when there's no data
             if (thresholds) {
                 maxEl.style.color = "";
                 minEl.style.color = "";
+                meanEl.style.color = "";
             }
             return;
         }
@@ -127,8 +126,7 @@ function updateStats(data) {
         if (thresholds) {
             maxEl.style.color = getColorForValue(maxVal, thresholds);
             minEl.style.color = getColorForValue(minVal, thresholds);
-            meanEl.style.color = getColorForValue(meanVal , thresholds);
-
+            meanEl.style.color = getColorForValue(meanVal, thresholds);
         }
     });
 }

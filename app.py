@@ -205,26 +205,51 @@ def load_doctor_appointments_page():
                                         schedule = general_schedule
         )
 
+
 @app.route('/patient_stats_page')
 def load_patient_stats_page():
 
-        if "user_id" not in session or session.get("role") != "patient": # can only be accessed from patient account 
+        if "user_id" not in session or session.get("role") != "patient":
                return redirect(url_for("load_main_page"))
         
-        user = db.session.get( UserAuth , session.get("user_id") )
+        user = db.session.get(UserAuth, session.get("user_id"))
 
-        return render_template("patient_stats_page.html" ,
-                               consultations = [{
-                                        "diagnostic" : c.diagnostic ,
-                                        "weight" : c.weight ,
-                                        "health_state" : c.health_state ,
-                                        "blood_pressure_systolic" : c.blood_pressure_systolic ,
-                                        "blood_pressure_diastolic" : c.blood_pressure_diastolic ,
-                                        "blood_oxygen_saturation" : c.blood_oxygen_saturation ,
-                                        "heart_rate" : c.heart_rate ,
-                                        "consultation_date" : c.consultation_date.strftime("%Y-%m-%d") ,
-                               } for c in user.patient.consultations]
-                               )
+        weights = [float(c.weight) for c in user.patient.consultations if c.weight not in (None, '')]
+        health_states = [float(c.health_state) for c in user.patient.consultations if c.health_state not in (None, '')]
+        bps = [float(c.blood_pressure_systolic) for c in user.patient.consultations if c.blood_pressure_systolic not in (None, '')]
+        bpd = [float(c.blood_pressure_diastolic) for c in user.patient.consultations if c.blood_pressure_diastolic not in (None, '')]
+        spo2 = [float(c.blood_oxygen_saturation) for c in user.patient.consultations if c.blood_oxygen_saturation not in (None, '')]
+        heart_rates = [float(c.heart_rate) for c in user.patient.consultations if c.heart_rate not in (None, '')]
+
+        def s(lst):
+                if not lst:
+                        return {"max": "N/A", "min": "N/A", "mean": "N/A"}
+                return {
+                        "max": int(max(lst)),
+                        "min": int(min(lst)),
+                        "mean": round(sum(lst) / len(lst), 1)
+                }
+
+        return render_template("patient_stats_page.html",
+                consultations=[{
+                        "diagnostic": c.diagnostic,
+                        "consultation_date": c.consultation_date.strftime("%Y-%m-%d"),
+                        "weight": c.weight,
+                        "health_state": c.health_state,
+                        "blood_pressure_systolic": c.blood_pressure_systolic,
+                        "blood_pressure_diastolic": c.blood_pressure_diastolic,
+                        "blood_oxygen_saturation": c.blood_oxygen_saturation,
+                        "heart_rate": c.heart_rate,
+                } for c in user.patient.consultations],
+                stats={
+                        "weight": s(weights),
+                        "health_state": s(health_states),
+                        "blood_pressure_systolic": s(bps),
+                        "blood_pressure_diastolic": s(bpd),
+                        "blood_oxygen_saturation": s(spo2),
+                        "heart_rate": s(heart_rates)
+                }
+        )
  
 @app.route('/patient_consultations_page')
 def load_patient_consultations_page():
