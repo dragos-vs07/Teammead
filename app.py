@@ -166,6 +166,7 @@ class DoctorException(db.Model): # stores blocked time segments where patients c
         end_date = db.Column(db.Date) # the end date for the exception
         start_time = db.Column(db.Time) # starting time of the time range that is blocked
         end_time = db.Column(db.Time) # end time of the time range that is blocked
+        source = db.Column(db.String(30)) # patient if it came from a patient ( an appointment ) , doctor if it was made by the doctor 
 
 # =========================
 # HELPERS
@@ -201,6 +202,12 @@ def load_doctor_appointments_page():
                                         doctor_id = user.doctor.id ,
                                         confirmation = 1 ,
                                         status = "upcoming" ).all() , # appointments accepted and that are on the way
+
+                                        submitted_exceptions = DoctorException.query.filter(
+                                                DoctorException.doctor_id == user.doctor.id ,
+                                                DoctorException.end_date >= datetime.today().date() ,
+                                                DoctorException.source == "doctor"
+                                        ).all() ,
 
                                         schedule = general_schedule
         )
@@ -432,31 +439,35 @@ def load_doctor_result_page(doctor_id):
                 phone_number = doctor.phone_number ,
                 adress = doctor.adress             
         )
-
 @app.route('/patient_make_appointment_page/<int:doctor_id>')
 def load_patient_make_appointment_page(doctor_id):
 
         if "user_id" not in session or session.get("role") != "patient": # only doctor can access this
                return redirect(url_for("load_main_page"))
         
+        # WE ONLY LOAD GENERAL SCHEDULE HERE , WE HANDLE EXCEPTIONS LATER BECAUSE THEY NEED TO BE TAKEN
+        # DAY BY DAY
+
         segment_dict = {i: [] for i in range(0, 7)} # stores valid time segments for each day of the week
 
         schedule = DoctorSchedule.query.filter_by(doctor_id = doctor_id).all()
 
-        for s in schedule:
+        for s in schedule: # for each of the 7 entries every doctor has that defines their schedule
 
-                if s.start_time :
+                if s.start_time : # if the doctor input anything means he works today
 
-                        current_time = datetime.combine( datetime.today() , s.start_time )
-                        end_time = datetime.combine( datetime.today() , s.end_time )
+                        current_date = datetime.combine( datetime.today() , s.start_time ) 
+                        end_date = datetime.combine( datetime.today() , s.end_time )
+                        # we combine to today date because timedelta cant be added to time element
+                        # only to datetime
 
-                        while current_time < end_time:
-                                segment_dict[s.day].append(current_time)
-                                current_time += timedelta( minutes = 30 )
+                        while current_date < end_date:
+                                segment_dict[s.day].append(current_date.time())
+                                current_date += timedelta( minutes = 30 )
 
         return render_template("patient_make_appointment_page.html" ,
                                 doctor = DoctorInfo.query.filter_by(id = doctor_id).first() ,
-                                time_segments = segment_dict 
+                                time_segments = segment_dict ,
                                )
 # =========================
 # REGISTER
@@ -626,21 +637,34 @@ def block_time_range():
         month = request.form.get("start_month_exception")
         year = request.form.get("start_year_exception")
 
-        start_date = date( int(day) , int(month) , int(year) )
+        start_date = date(int(year), int(month), int(day))
 
         day = request.form.get("end_day_exception")
         month = request.form.get("end_month_exception")
         year = request.form.get("end_year_exception")
 
-        end_date = date( int(day) , int(month) , int(year) )
+        end_date = date(int(year), int(month), int(day))
+
 
         hour = request.form.get("start_hour_exception")
         minute =  request.form.get("start_minute_exception")
+
+        if not minute:
+                minute = 0
+
+        if not hour:
+                hour = 0
 
         start_time = time( int(hour) , int(minute) )
 
         hour = request.form.get("end_hour_exception")
         minute =  request.form.get("end_minute_exception")
+
+        if not minute:
+                minute = 0
+
+        if not hour:
+                hour = 0
 
         end_time = time( int(hour) , int(minute) )
 
@@ -649,11 +673,14 @@ def block_time_range():
                 start_date = start_date ,
                 end_date = end_date ,
                 start_time = start_time ,
-                end_time = end_time 
+                end_time = end_time ,
+                source = "doctor"
         )
 
         db.session.add(new_time_range)
         db.session.commit()
+
+        return redirect(url_for("load_doctor_appointments_page"))
 
 @app.route('/submit_general_schedule' , methods =["POST"])
 def set_schedule():
@@ -724,12 +751,39 @@ def confirm_appointments():
                         if appointment_response == '1':
                                 ap.confirmation = 1
                                 ap.status = "upcoming"
+                                new_exception = DoctorException(
+                                        doctor_id = user.doctor.id ,
+                                        start_date = ap.appointment_date.date() ,
+                                        start_time = ap.appointment_date.time() ,
+                                        end_date = ap.appointment_date.date() ,
+                                        end_time = ( ap.appointment_date + timedelta(minutes = 30) ).time() ,
+                                        source = "patient"
+                                        # start date and end date ar the same
+                                        # lasts 30 minutes
+                                        # this is how we distinguish it from an exception made by the doctor 
+                                        # this blocks a time segmetn when an appointment is made
+                                )
+                                db.session.add(new_exception)
                         else:
                                 ap.confirmation = -1
                                 ap.status = "rejected"
         
         db.session.commit()
         return redirect(url_for('load_doctor_appointments_page'))
+
+@app.route('/api/get_exceptions/<int:doctor_id>')
+def get_exceptions(doctor_id):
+
+        exceptions = DoctorException.query.filter_by(doctor_id = doctor_id).all()
+        return jsonify([
+        {
+                "start_date": str(e.start_date),
+                "start_time": str(e.start_time),
+                "end_date":   str(e.end_date),
+                "end_time":   str(e.end_time)
+        } for e in exceptions
+        ])
+
 
 @app.route('/api/get_doctor_schedule/<int:doctor_id>/<start_view>/<end_view>')
 def get_schedule( doctor_id , start_view , end_view ):
@@ -810,8 +864,7 @@ def register_appointment():
         
         PatientQuery = PatientInfo.query.filter_by( user_id = session["user_id"] ).first()
 
-        print(data['date'])
-
+        print("HERE:" , data['date'])
         new_appointment = AppointmentInfo(
                 doctor_id = data["doctor_id"] ,
                 patient_id = PatientQuery.id ,

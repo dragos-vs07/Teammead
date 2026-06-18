@@ -66,19 +66,20 @@ body{
     padding: 10px;
     border: 3px solid rgba(0, 0, 0, 0.25);
     border-radius: 13px;
+    background-color: white;
 }
-.container{
+.inner_box{
     padding: 10px;
-    border: 3px solid rgba(0, 0, 0, 0.25);
+    border: 3px solid rgb(0, 60, 106,0.35);
     border-radius: 13px;
+    background-color:#efeff3;
 }
-.pending_ap_list{
-    width: 100%;
-    height: 15rem;
-    overflow-y: auto;
-}
-.upcoming_ap_list{
-    width: 100%;
+.ap_list{
+    padding: 10px;
+    border: 3px solid rgb(0, 60, 106,0.35);
+    border-radius: 13px;
+   background-color:#efeff3;
+    width: 95%;
     height: 15rem;
     overflow-y: auto;
 }

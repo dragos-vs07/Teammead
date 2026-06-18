@@ -51,7 +51,7 @@
 
                             <h3>Pending appointments</h3>
 
-                            <div class ="pending_ap_list">
+                            <div class ="ap_list">
 
                                 <form method = "POST" action = "/submit_appointments_response">
 
@@ -85,9 +85,7 @@
 
                             <h3>Upcoming appointments</h3>
 
-                            <div class ="upcoming_ap_list">
-
-                                
+                            <div class ="ap_list">
 
                                 {% for ap in upcoming_appointments %}
 
@@ -110,33 +108,35 @@
                         <div class ="container">
 
                                 <h3>Edit general schedule</h3>
-                                <form method = "POST" action = "/submit_general_schedule">
+                                <div class ="inner_box">
+                                    <form method = "POST" action = "/submit_general_schedule">
 
-                                    {% set days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] %}
+                                        {% set days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] %}
 
-                                    {% for day in days %}
-                                    {% set s = schedule[loop.index0] %}
+                                        {% for day in days %}
+                                        {% set s = schedule[loop.index0] %}
 
-                                            <label>{{ day.title() }}:</label>
+                                                <label>{{ day.title() }}:</label>
 
-                                            <input type="number" name="start_hour_{{day}}" min="0" max="23" placeholder="hour" class="input_box"
-                                                value="{{ s.start_time.hour if s.start_time else '' }}"> :
-                                            <input type="number" name="start_minute_{{day}}" min="0" max="59" placeholder="minute" class="input_box"
-                                                value="{{ s.start_time.minute if s.start_time else '' }}">
+                                                <input type="number" name="start_hour_{{day}}" min="0" max="23" placeholder="hour" class="input_box"
+                                                    value="{{ s.start_time.hour if s.start_time else '' }}"> :
+                                                <input type="number" name="start_minute_{{day}}" min="0" max="59" placeholder="minute" class="input_box"
+                                                    value="{{ s.start_time.minute if s.start_time else '' }}">
 
-                                            -
+                                                -
 
-                                            <input type="number" name="end_hour_{{day}}" min="0" max="23" placeholder="hour" class="input_box"
-                                                value="{{ s.end_time.hour if s.end_time else '' }}"> :
-                                            <input type="number" name="end_minute_{{day}}" min="0" max="59" placeholder="minute" class="input_box"
-                                                value="{{ s.end_time.minute if s.end_time else '' }}">
+                                                <input type="number" name="end_hour_{{day}}" min="0" max="23" placeholder="hour" class="input_box"
+                                                    value="{{ s.end_time.hour if s.end_time else '' }}"> :
+                                                <input type="number" name="end_minute_{{day}}" min="0" max="59" placeholder="minute" class="input_box"
+                                                    value="{{ s.end_time.minute if s.end_time else '' }}">
 
-                                            <br><br>
-                                    {% endfor %}
+                                                <br><br>
+                                        {% endfor %}
 
-                                    
-                                    <button type ="submit" class ="input_box"><strong>Submit schedule</strong></button>
-                                </form>
+                                        
+                                        <button type ="submit" class ="input_box"><strong>Submit schedule</strong></button>
+                                    </form>
+                                </div>
                         </div>
                         
                         <div class ="container">
@@ -177,6 +177,18 @@
 
                                     <button type ="submit" class ="input_box"><strong>Submit unavailability</strong></button>
                                 </form>
+
+                                <br>
+
+                                <div class ="ap_list"> <!-- allows user to see and edit unavailability periods that were submitted-->
+                                        {% for e in submitted_exceptions %}
+                                                <div class="ap_box">
+
+                                                    <p> {{e.start_date}} : {{e.start_time}} - {{e.end_date}} : {{e.end_time}} </p>
+
+                                                </div>
+                                        {% endfor %}
+                                </div>
                         </div>
 
                     </div>

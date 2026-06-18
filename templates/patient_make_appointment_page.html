@@ -66,7 +66,7 @@
                                                        {% for day in range(0,7) %}
                                                             <div id = "{{day}}_segments" style ="display:none" >
                                                                     {% for segment in time_segments[ day ] %}
-                                                                        <button type="button" class = "time_segment_button"  onclick ="selectTimeSegment(this)">{{segment}}</button>
+                                                                        <button type="button" class = "time_segment_button" onclick ="selectTimeSegment(this)">{{segment}}</button>
                                                                     {% endfor %}
                                                             </div>
                                                        {% endfor %}
