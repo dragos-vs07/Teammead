@@ -1,7 +1,3 @@
-function logout_user()
-{
-     window.location.href ="/logout";
-}
 
 const consultation_dates = consultations_list.map(c => {
   const d = new Date(c.consultation_date);

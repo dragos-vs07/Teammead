@@ -3,6 +3,7 @@
 <html>
     <head>
         <link rel="stylesheet" href="{{ url_for('static', filename='CSS/patient_page.css') }}">
+        <link rel ="stylesheet" href = "{{ url_for('static', filename='CSS/sidebar.css') }}">
         <title>Teammed</title>
     </head>
     <body>
@@ -13,12 +14,12 @@
 
                     <div class = "right_side">
                     
-                        <div class="upper_bar">
-                             <h2>Information for patient {{ first_name }} {{ last_name }} </h2>
-                         </div>
-
+                        
+                             <h2>Information for Dr. {{ first_name.title() }} {{ last_name.title() }} </h2>
+                         
                             <br>
-
+                            <br>
+                            
                             <div class ="upper_area">
 
                                     <div class ="consultation_container">
@@ -63,7 +64,7 @@
 
                     
             </div>
-            
+            <script src = "{{ url_for('static' , filename = 'JavaScript/sidebar.js') }}"></script>
             <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
             <script> const consultations_list = {{ consultations | tojson | safe }};</script>
             <script src = "{{ url_for('static' , filename = 'JavaScript/patient_page.js') }}"></script>

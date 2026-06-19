@@ -3,6 +3,7 @@
 <html>
     <head>
         <link rel="stylesheet" href="{{ url_for('static', filename='CSS/patient_make_appointment_page.css') }}">
+        <link rel ="stylesheet" href = "{{ url_for('static', filename='CSS/sidebar.css') }}">
         <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.10/index.global.min.css' rel='stylesheet'>
         <title>Teammed</title>
     </head>
@@ -57,7 +58,8 @@
             {% for message in get_flashed_messages() %}
                 <p>{{message}}</p>
             {% endfor %}
-
+            
+            <script src = "{{ url_for('static' , filename = 'JavaScript/sidebar.js') }}"></script>
             <script>const doctorId = {{ doctor.id }}; </script>
             <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.10/index.global.min.js'></script>
             <script src = "{{ url_for('static' , filename = 'JavaScript/patient_make_appointment_page.js') }}"></script>

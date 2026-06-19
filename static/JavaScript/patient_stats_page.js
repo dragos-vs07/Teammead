@@ -1,8 +1,4 @@
 
-function logout_user()
-{
-     window.location.href ="/logout";
-}
 /* helper */
 
 function getMean(arr, field) {

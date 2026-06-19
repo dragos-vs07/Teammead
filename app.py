@@ -321,7 +321,7 @@ def load_doctor_consultations_page():
         return render_template(
                                "doctor_consultations_page.html" ,
                                consultations = user.doctor.consultations ,
-                               patients = set([ c.patient for c in user.doctor.consultations]) 
+                               patients = PatientInfo.query.all() 
                                )
 @app.route('/load_edit_consultation_page/<consultation_id>')
 def load_edit_consultation_page(consultation_id):
@@ -371,9 +371,11 @@ def load_doctor_page():
 
         return render_template(
             "doctor_page.html",
-            first_name = user.first_name.title(),
-            last_name = user.last_name.title() ,
-            doctor = user
+             first_name = user.first_name ,
+             last_name = user.last_name ,
+             consultations = user.consultations[-3:] ,
+             appointments = user.appointments[-3:] ,
+             patients = set([c.patient for c in user.consultations])
         )
 
 @app.route('/register') # loads register menu
@@ -493,6 +495,12 @@ def submit_register_data():
                 flash("Email required")
                 return redirect(url_for("load_register_page"))
 
+        birthday_date = request.form.get("birth_date")
+
+        if not birthday_date :
+                flash("Birthday date must be completed")
+                return redirect( url_for("load_register_page") )
+        
         existing_user_username = UserAuth.query.filter_by(username=username).first()
         existing_user_email = UserAuth.query.filter_by(email=email).first()
 
@@ -515,26 +523,12 @@ def submit_register_data():
         db.session.add(new_user)
         db.session.commit()
 
-        day = request.form.get("day")
-        month = request.form.get("month")
-        year = request.form.get("year")
-
-        if not day or not month or not year :
-                flash("Birthday date must be completed")
-                return redirect( url_for("load_register_page") )
-
-        StringBday = create_string_date( #birthday as a string
-            day ,
-            month ,
-            year
-        )
-
         if is_doctor == "on":
                 new_doctor = DoctorInfo(
                       user_id = new_user.id,
                       first_name = request.form.get("first_name").lower(),
                       last_name = request.form.get("last_name").lower(),
-                      birth_date = datetime.strptime(StringBday,"%d-%m-%Y").date() ,
+                      birth_date = datetime.strptime(birthday_date,"%Y-%m-%d").date() ,
                       gender = request.form.get("gender"),
                       contact_email = request.form.get("contact_email"), 
                       phone_number = request.form.get("phone_number"),
@@ -547,7 +541,7 @@ def submit_register_data():
                       user_id = new_user.id,
                       first_name = request.form.get("first_name").lower(),
                       last_name = request.form.get("last_name").lower(),
-                      birth_date = datetime.strptime(StringBday,"%d-%m-%Y").date() ,
+                      birth_date = datetime.strptime(birthday_date,"%Y-%m-%d").date() ,
                       gender = request.form.get("gender"),
                       contact_email = request.form.get("contact_email"),
                       phone_number = request.form.get("phone_number"),
@@ -879,10 +873,18 @@ def submit_consultation():
                 file_path = os.path.join( folder_path , file.filename )
                 file.save(file_path)
 
-        year = request.form.get("year")
-        month = request.form.get("month")
-        day = request.form.get("day")
+        date = request.form.get("consultation_date")
 
+        if not date:
+                flash("Must set the date of the consultation")
+                return redirect(url_for("load_patient_result_page"))
+        
+        diagnostic = request.form.get("diagnostic")
+
+        if not diagnostic :
+                flash("Must confirm a diagnostic")
+                return redirect(url_for("load_patient_result_page"))
+        
         new_consultation = ConsultationInfo(
                 diagnostic=request.form.get("diagnostic"),
                 weight=request.form.get("weight"),
@@ -891,20 +893,12 @@ def submit_consultation():
                 blood_pressure_systolic = request.form.get("blood_pressure_systolic") ,
                 blood_pressure_diastolic = request.form.get("blood_pressure_diastolic") ,
                 blood_oxygen_saturation = request.form.get("blood_oxygen_saturation")  ,
-                consultation_date=datetime( int(year) , int(month) , int(day) ) ,
+                consultation_date=datetime.strptime(date , "%Y-%m-%d") ,
                 doctor_id=doc.id,
                 patient_id=pat.id,
                 upload_file_path=file_path,
                 update_date = date.today()
         )
-
-        if not new_consultation.diagnostic :
-                flash("Must confirm a diagnostic")
-                return redirect(url_for("load_patient_result_page"))
-        
-        if not new_consultation.consultation_date :
-                flash("Must specify the date of the consultation")
-                return redirect(url_for("load_patient_result_page"))
         
         db.session.add(new_consultation)
         db.session.commit()

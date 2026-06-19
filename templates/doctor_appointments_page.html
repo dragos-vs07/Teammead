@@ -3,6 +3,7 @@
 <html>
     <head>
         <link rel="stylesheet" href="{{ url_for('static', filename='CSS/doctor_appointments_page.css') }}">
+        <link rel ="stylesheet" href = "{{ url_for('static', filename='CSS/sidebar.css') }}">
         <title>Teammed</title>
     </head>
     <body>
@@ -136,7 +137,7 @@
                     </div>
 
         </div>
-
+            <script src = "{{ url_for('static' , filename = 'JavaScript/sidebar.js') }}"></script>
             <script src = "{{ url_for('static' , filename = 'JavaScript/doctor_appointments_page.js') }}"></script>
     </body>
 

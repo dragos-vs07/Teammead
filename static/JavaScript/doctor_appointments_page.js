@@ -1,7 +1,4 @@
-function logout_user()
-{
-     window.location.href ="/logout";
-}
+
 
 const start_date_input = document.getElementById("start_date_input")
 const end_date_input = document.getElementById("end_date_input")

@@ -3,6 +3,7 @@
 <html>
     <head>
         <link rel="stylesheet" href="{{ url_for('static', filename='CSS/patient_appointments_page.css') }}">
+        <link rel ="stylesheet" href = "{{ url_for('static', filename='CSS/sidebar.css') }}">
         <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.10/index.global.min.css' rel='stylesheet'>
         <title>Teammed</title>
     </head>
@@ -40,7 +41,7 @@
                                                     <div class ="appointments_list">
 
                                                         {% for ap in appointments %}
-                                                                <div class ="appointment_box_{{ap.confirmation}}">
+                                                                <div class ="appointment_box_{{ap.confirmation}}" style ="padding-left: 5px">
                                                                         <p>Dr. {{ap.doctor.first_name.title()}} {{ap.doctor.last_name.title()}}</p>
                                                                         {% if ap.doctor.specialisation %}
                                                                          <p>{{ap.doctor.specialisation.title()}}</p>
@@ -72,6 +73,7 @@
 
             
             <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.10/index.global.min.js'></script>
+            <script src = "{{ url_for('static' , filename = 'JavaScript/sidebar.js') }}"></script>
             <script src = "{{ url_for('static' , filename = 'JavaScript/patient_appointments_page.js') }}"></script>
     </body>
 

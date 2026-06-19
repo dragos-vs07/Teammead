@@ -1,3 +1,4 @@
+
 searchBar = document.getElementById("patient_search");
 searchBar.addEventListener("input" , function(){
 

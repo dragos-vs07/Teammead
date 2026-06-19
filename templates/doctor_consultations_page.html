@@ -3,6 +3,7 @@
 <html>
     <head>
             <link rel ="stylesheet" href = "{{ url_for('static', filename='CSS/doctor_consultations_page.css') }}">
+            <link rel ="stylesheet" href = "{{ url_for('static', filename='CSS/sidebar.css') }}">
     </head>
     <body>
             <div class ="content">
@@ -13,13 +14,21 @@
 
                             <div class ="container"> 
 
-                                    <h3>Patients:</h3>
+                                    <h3 style>Patients:</h3>
+
+                                    <input type="text" id="patient_search" placeholder="search patient">
+
+                                    <br>
+                                    <br>
+                                                
                                     <div class ="patients_list">
                                         {% for p in patients %}  
-                                                    <button type ="button" class ="patient_button" onclick = " window.location.href='/display_patient/{{p.id}}'" >{{p.first_name.title()}} {{p.last_name.title()}}</button>
+                                                <button type ="button" class ="patient_button" onclick = " window.location.href='/display_patient/{{p.id}}'" >{{p.first_name.title()}} {{p.last_name.title()}}</button>
                                         {% endfor %}
                                     </div>
+
                             </div>
+
                             <div class ="container"> 
 
                                     <h3>Consultations:</h3>
@@ -37,7 +46,7 @@
                             </div>
                     </div>
             </div>
-
+            <script src = "{{ url_for('static' , filename = 'JavaScript/sidebar.js') }}"></script>
             <script src = "{{ url_for('static' , filename = 'JavaScript/doctor_consultations_page.js') }}"></script>
     </body>
 </html>

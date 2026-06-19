@@ -87,6 +87,7 @@ body{
     border-left-width: 2px;
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
+    padding-left: 5px;
 }
 .appointment_box_0{
     background: rgba(115, 116, 116, 0.18);
@@ -97,6 +98,7 @@ body{
     border-left-width: 2px;
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
+    padding-left: 5px;
 }
 .appointment_box_-1{
     background: rgba(221, 38, 28, 0.18);
@@ -107,6 +109,7 @@ body{
     border-left-width: 2px;
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
+    padding-left: 5px;
 }
 .doctor_button{
     width: 100%;
@@ -119,4 +122,7 @@ body{
 #calendar{
     width: 650px;
     height: 650px;
+}
+#doctor_search{
+    width: 26rem;
 }

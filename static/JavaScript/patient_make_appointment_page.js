@@ -5,11 +5,6 @@ fetch(`/api/get_exceptions/${doctorId}`)
     .then(r => r.json())
     .then(data => { exceptions_list = data; });
 
-//SIDEBAR
-function logout_user()
-{
-     window.location.href ="/logout";
-}
 
 // CALENDAR
 
@@ -31,12 +26,12 @@ function blocked(dateStr, timeStr) {
                     return true;
                else if(e.start_date == dateStr && e.start_time <= timeStr) //if it s on the first day and after starting time
                     return true;
-                else if(e.end_date == dateStr &&  timeStr <= e.end_time ) //if it s on the last day and before ending time
+                else if(e.end_date == dateStr &&  timeStr < e.end_time ) //if it s on the last day and before ending time
                     return true;     
           }
           else if(e.start_date == dateStr) //if the blockage is single day and the day matches
           {
-                    if(e.start_time <= timeStr && timeStr <= e.end_time) //if between the closing times
+                    if(e.start_time <= timeStr && timeStr < e.end_time) //if between the closing times
                          return true;
           }
     }

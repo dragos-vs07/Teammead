@@ -3,6 +3,7 @@
 <html>
     <head>
         <link rel="stylesheet" href="{{ url_for('static', filename='CSS/patient_stats_page.css') }}">
+        <link rel ="stylesheet" href = "{{ url_for('static', filename='CSS/sidebar.css') }}">
         <title>Teammed</title>
     </head>
     <body>
@@ -53,7 +54,8 @@
                             {% endfor %}
                         
             </div>
-                 
+            
+            <script src = "{{ url_for('static' , filename = 'JavaScript/sidebar.js') }}"></script>
             <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
             <script> const consultations_list = {{ consultations | tojson | safe }};</script>
             <script src = "{{ url_for('static' , filename = 'JavaScript/patient_stats_page.js') }}"></script>
