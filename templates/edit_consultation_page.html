@@ -15,46 +15,44 @@
 
 
                             <label>Diagnostic:</label>
-                            <input type ="text"  name="diagnostic" value = {{c.diagnostic}} class ="input_box">
+                            <input type ="text"  name="diagnostic" value = "{{c.diagnostic}}" class ="input_box">
 
                             <br>
                             <br>
 
                             <label>Date:</label>
-                            <input type ="number"  name="day"  min="0"  max="31" placeholder ="day" value = {{c.consultation_date.day}} class ="input_box">
-                            <input type ="number"  name="month"  min="1"  max="12" placeholder ="month" value = {{c.consultation_date.month}} class ="input_box">
-                            <input type ="number"  name="year"  min="1900"  max="2026" placeholder ="year" value = {{c.consultation_date.year}} class ="input_box">
+                            <input type ="date"  name="date" value = "{{c.consultation_date}}" class ="input_box">
 
                             <br>
                             <br>
 
                             <label >Weight:</label>
-                            <input type ="number"  name="weight" value = {{c.weight}} class ="input_box">
+                            <input type ="number"  name="weight" value = "{{c.weight}}" class ="input_box">
 
                             <br>
                             <br>
 
                             <label >Health state:</label>
-                            <input type ="number"  name="health_state" min = 0 max = 10  value = {{c.health_state}} class ="input_box">
+                            <input type ="number"  name="health_state" min = 0 max = 10  value = "{{c.health_state}}" class ="input_box">
 
                             <br>
                             <br>
 
                             <label >Heart rate:</label>
-                            <input type ="number"  name="heart_rate" class ="input_box" value ={{c.heart_rate}} >
+                            <input type ="number"  name="heart_rate" class ="input_box" value = "{{c.heart_rate}}" >
 
                             <br>
                             <br>
 
                             <label >Blood pressure:</label>
-                            <input type ="number"  name="blood_pressure_systolic"  value = {{c.blood_pressure_systolic}} class ="input_box"> /
-                            <input type ="number"  name="blood_pressure_diastolic"  value = {{c.blood_pressure_diastolic}} class ="input_box">
+                            <input type ="number"  name="blood_pressure_systolic"  value = "{{c.blood_pressure_systolic}}" class ="input_box"> /
+                            <input type ="number"  name="blood_pressure_diastolic"  value = "{{c.blood_pressure_diastolic}}" class ="input_box">
 
                             <br>
                             <br>
 
                             <label >SpO<sub>2:</label>
-                            <input type ="number"  name="blood_oxygen_saturation" min = 0 max = 100   class ="input_box" value ={{c.blood_oxygen_saturation}}>
+                            <input type ="number"  name="blood_oxygen_saturation" min = 0 max = 100   class ="input_box" value ="{{c.blood_oxygen_saturation}}">
 
                             <br>
                             <br>

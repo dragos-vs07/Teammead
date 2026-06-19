@@ -22,8 +22,10 @@ function submit_deactivation()
             body : JSON.stringify({ input_password : input_password })
         }
     ).then( res => res.json() ).then( data => {
-            if( !data.success ){
-                alert("Wrong password");}
+            if( !data.success )
+                alert("Wrong password");
+            else
+                window.location.href ="/"
     })
 }
 function open_password_change_window()

@@ -99,19 +99,15 @@
                             <p> blood pressure: {{c.blood_pressure_systolic}} / {{c.blood_pressure_diastolic}} </p>
                             <p> SpO<sub>2</sub>: {{c.blood_oxygen_saturation}} % </p>
                             {% if c.upload_file_path is not none %}
-                                <a href="{{ url_for('download_attachment', consultation_id = c.id ) }}">
-                                    <button class ="download_button">
+                                    <button class ="download_button" type ="button" onclick = "window.location.href ='/download_attachment/{{c.id}}'">
                                         Download Attachment
                                     </button>
-                                </a>
                             {% endif %}
                             
                             {% if c.doctor_user_id == session["user_id"] %}
-                            <a href ="{{ url_for('load_edit_consultation_page' , consultation_id = c.id ) }}"
-                                <button class ="edit_button">
+                                <button class ="edit_button" type ="button" onclick = "window.location.href ='/load_edit_consultation_page/{{c.id}}'">
                                     Edit
                                 </button>
-                            </a>
                             {% endif %}
                         </div>
                     <hr class ="between_consultations">

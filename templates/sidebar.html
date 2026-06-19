@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+            <link rel ="stylesheet" href = "{{ url_for('static', filename='CSS/sidebar.css') }}">
+    </head>
+
+    <body>
+
+    
+                            <div class = "sidebar">
+
+                                    <div class ="logo">
+                                        <span class="second_half">Team</span><span class="third_half">med</span>
+                                    </div>
+
+                                    <br>
+                                    <br>
+                                        
+                                        {% if session["role"] == "patient" %}
+
+                                        <button class="sidebar_button" onclick="window.location.href='/patient_stats_page'">
+                                            Statistics
+                                        </button>
+                                        
+                                        {% else %}
+
+                                        <button class="sidebar_button" onclick="window.location.href='/doctor_stats_page'">
+                                            Statistics
+                                        </button>
+
+                                        {% endif %}
+                                    
+                                    <br>
+                                    <br>
+
+                                        {% if session["role"] == "patient" %}
+
+                                        <button class="sidebar_button" onclick="window.location.href='/patient_appointments_page'">
+                                            Appointments
+                                        </button>
+
+                                        {% else %}
+
+                                        <button class="sidebar_button" onclick="window.location.href='/doctor_appointments_page'">
+                                            Appointments
+                                        </button>
+
+                                        {% endif %}
+
+                                    <br>
+                                    <br>
+
+                                        {% if session["role"] == "patient" %}
+
+                                        <button class="sidebar_button" onclick="window.location.href='/patient_consultations_page'">
+                                            Consultations
+                                        </button>
+
+                                        {% else %}
+
+                                        <button class="sidebar_button" onclick="window.location.href='/doctor_consultations_page'">
+                                            Consultations
+                                        </button>
+
+                                        {% endif %}
+
+                                    
+                                    <br>
+                                    <br>
+
+                                        <button class="sidebar_button"  onclick="window.location.href='/edit_account'">
+                                            Edit Account
+                                        </button>
+
+                                        <button onclick = "logout_user()" class="sidebar_button" id="logout_button">Log out</button>
+
+                            </div>
+
+                <script src = "{{ url_for('static' , filename = 'JavaScript/sidebar.js') }}"></script>
+        </body>
+
+</html>

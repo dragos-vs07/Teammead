@@ -8,42 +8,8 @@
     <body>
         
         <div class ="content">
-                <div class = "sidebar">
-                                <div class ="logo">
-                                    <span class="second_half">Team</span><span class="third_half">med</span>
-                                </div>
-
-                                <br>
-                                <br>
-
-                                    <button class="sidebar_button" onclick="window.location.href='/patient_stats_page'">
-                                        Statistics
-                                    </button>
-                                
-                                <br>
-                                <br>
-
-                                    <button class="sidebar_button" onclick="window.location.href='/patient_appointments_page'">
-                                        Appointments
-                                    </button>
-
-                                <br>
-                                <br>
-
-                                    <button class="sidebar_button" onclick="window.location.href='/patient_consultations_page'">
-                                        Consultations
-                                    </button>
-                                
-                                <br>
-                                <br>
-
-                                    <button class="sidebar_button"  onclick="window.location.href='/edit_account'">
-                                        Edit Account
-                                    </button>
-
-                                    <button onclick = "logout_user()" class="sidebar_button" id="logout_button">Log out</button>
-
-                            </div>
+            
+                {% include "sidebar.html" %}
 
                 <div class = "right_side">
 

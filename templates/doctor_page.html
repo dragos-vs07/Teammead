@@ -9,42 +9,8 @@
 
         <div class ="content">
 
-                    <div class = "sidebar">
-                        <div class ="logo">
-                            <span class="second_half">Team</span><span class="third_half">med</span>
-                        </div>
-
-                        <br>
-                        <br>
-
-                            <button class="sidebar_button" onclick="window.location.href='/doctor_stats_page'">
-                                Statistics
-                            </button>
-                        
-                        <br>
-                        <br>
-
-                            <button class="sidebar_button" onclick="window.location.href='/doctor_appointments_page'">
-                                Appointments
-                            </button>
-
-                        <br>
-                        <br>
-
-                            <button class="sidebar_button" onclick="window.location.href='/doctor_consultations_page'">
-                                Consultations
-                            </button>
-                        
-                        <br>
-                        <br>
-
-                            <button class="sidebar_button"  onclick="window.location.href='/edit_account'">
-                                Edit Account
-                            </button>
-
-                            <button onclick = "logout_user()" class="sidebar_button" id="logout_button">Log out</button>
-
-                    </div>
+                    {% include "sidebar.html" %}
+                    
                     <div class = "right_side">
                                     <h2>Information for doctor {{ first_name }} {{ last_name }} </h2>
 
@@ -83,18 +49,18 @@
                                             <p> SpO<sub>2</sub>: {{c.blood_oxygen_saturation}} % </p>
 
                                             {% if c.upload_file_path is not none %}
-                                                <a href="{{ url_for('download_attachment', consultation_id = c.id) }}">
-                                                    <button class ="download_button">
+                                                
+                                                    <button class ="download_button" type ="button" onclick = "window.location.href ='/download_attachment/{{c.id}}'">
                                                         download attachment
                                                     </button>
-                                                </a>
+                                                
                                             {% endif %}
                                             
-                                            <a href ="{{ url_for('load_edit_consultation_page' , consultation_id = c.id ) }}"
-                                                <button class ="edit_button">
+                                            
+                                                <button class ="edit_button" type ="button" onclick = "window.location.href ='/load_edit_consultation_page/{{c.id}}'">
                                                     Edit
                                                 </button>
-                                            </a>
+                                            
 
                                         </div>
                                         <hr class ="between_consultations">

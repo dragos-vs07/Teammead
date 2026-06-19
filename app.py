@@ -307,12 +307,22 @@ def load_edit_account_page(): # loads the edit account menu
                    old_specialisation=specialisation , # null if user is a patient , checked anyway in jinja
                    old_adress =user_entry.adress ,
                    old_phone_number=user_entry.phone_number,
-                   old_day=user_entry.birth_date.day ,
-                   old_month=user_entry.birth_date.month ,
-                   old_year=user_entry.birth_date.year ,
-                   gender=user_entry.gender
+                   old_birthday=user_entry.birth_date ,
+                gender=user_entry.gender
         )
+@app.route('/doctor_consultations_page')
+def load_doctor_consultations_page():
 
+        if "user_id" not in session or session.get("role") != "doctor": # only doctor can access this
+               return redirect(url_for("load_main_page"))
+        
+        user = UserAuth.query.filter_by(id = session["user_id"]).first()
+
+        return render_template(
+                               "doctor_consultations_page.html" ,
+                               consultations = user.doctor.consultations ,
+                               patients = set([ c.patient for c in user.doctor.consultations]) 
+                               )
 @app.route('/load_edit_consultation_page/<consultation_id>')
 def load_edit_consultation_page(consultation_id):
 
@@ -370,23 +380,14 @@ def load_doctor_page():
 def load_register_page():
         return render_template("register.html")
 
-@app.route('/find_patient' , methods=["POST","GET"]) # displays results for a sought patient
-def load_patient_result_page():
+@app.route('/display_patient/<int:patient_id>' ) # displays results for a sought patient
+def load_patient_result_page(patient_id):
 
         if "user_id" not in session or session.get("role") != "doctor": # only doctor can access this
                return redirect(url_for("load_main_page"))
-        
-        patient_first_name = request.form.get("first_name")
-        patient_last_name = request.form.get("last_name")
-
-        if not patient_first_name or not patient_last_name :
-                flash("Must complete full name")
-                return redirect(url_for('load_doctor_page'))
-        
-        query_patient = PatientInfo.query.filter_by(
-                first_name=patient_first_name.lower(),
-                last_name=patient_last_name.lower()
-                ).first()
+         
+        query_patient = PatientInfo.query.filter_by(id = patient_id).first()
+        user = UserAuth.query.filter_by(id = session["user_id"]).first()
 
         if not query_patient :
                 flash("Patient doesnt exist")
@@ -396,8 +397,8 @@ def load_patient_result_page():
 
         return render_template(
             "patient_result.html",
-            first_name=patient_first_name.title(),
-            last_name=patient_last_name.title(),
+            first_name=query_patient.first_name.title(),
+            last_name=query_patient.last_name.title(),
             birth_date=query_patient.birth_date,
             gender=query_patient.gender,
             email=query_patient.contact_email,
@@ -415,7 +416,7 @@ def load_patient_result_page():
                 "upload_file_path" : c.upload_file_path ,
                 "doctor_user_id" : c.doctor.user_id
             }
-            for c in query_patient.consultations
+            for c in ConsultationInfo.query.filter_by( patient_id = query_patient.id , doctor_id = user.doctor.id ).all()
             ] , 
             update_date=date.today() ,
         )
@@ -639,10 +640,10 @@ def block_time_range():
 
         new_time_range = DoctorException(
                 doctor_id = user.doctor.id ,
-                start_date = start_date.date() ,
-                end_date = end_date.date() ,
-                start_time = start_date.time() ,
-                end_time = end_date.time() ,
+                start_date = datetime.fromisoformat(start_date).date() ,
+                end_date = datetime.fromisoformat(end_date).date() ,
+                start_time = datetime.fromisoformat(start_date).time() ,
+                end_time = datetime.fromisoformat(end_date).time() ,
                 source = "doctor"
         )
 
@@ -671,8 +672,11 @@ def set_schedule():
 
         for i, s in enumerate(schedule):
 
-                s.start_time = datetime.strptime(schedule_time_ranges[i][0],"%H:%M").time()
-                s.end_time = datetime.strptime(schedule_time_ranges[i][1],"%H:%M").time()
+                vals = schedule_time_ranges[i][0]
+                vale =  schedule_time_ranges[i][1]
+
+                s.start_time = datetime.strptime(vals,"%H:%M").time() if vals else None 
+                s.end_time = datetime.strptime(vale,"%H:%M").time() if vale else None
         
         db.session.commit()
 
@@ -917,7 +921,6 @@ def apply_changes(consultation_id):
         consultation = ConsultationInfo.query.get_or_404(consultation_id)
 
         consultation.weight = request.form.get("weight")
-        consultation.diagnostic = request.form.get("diagnostic")
         consultation.health_state = request.form.get("health_state")
         consultation.blood_pressure_systolic = request.form.get("blood_pressure_systolic") 
         consultation.blood_pressure_diastolic = request.form.get("blood_pressure_diastolic") 
@@ -925,19 +928,21 @@ def apply_changes(consultation_id):
         consultation.heart_rate = request.form.get("heart_rate") 
         consultation.update_date = date.today()
 
-        day = request.form.get("day")
-        month = request.form.get("month")
-        year = request.form.get("year")
+        new_consultation_date = request.form.get("date")
 
-        if not day or not month or not year :
+        if not new_consultation_date :
                 flash("Consultation date must be completed")
                 return redirect(url_for("load_edit_consultation_page", consultation_id=consultation_id))
 
-        consultation.consultation_date = datetime(day,month,year) 
+        consultation.consultation_date = datetime.strptime(new_consultation_date, "%Y-%m-%d").date() 
 
-        if not consultation.diagnostic :
+        new_diagnostic = request.form.get("diagnostic")
+
+        if not new_diagnostic :
                 flash("Diagnostic must be completed")
                 return redirect(url_for("load_edit_consultation_page", consultation_id=consultation_id))
+
+        consultation.diagnostic = new_diagnostic
 
         db.session.commit()
 
@@ -973,9 +978,7 @@ def update_profile_data():
                 user_entry = PatientInfo.query.filter_by(user_id=session.get("user_id")).first()
                 
 
-        year = request.form.get("year")
-        month = request.form.get("month")
-        day = request.form.get("day")
+        new_birthday = request.form.get("birth_date")
 
         username = request.form.get("username")
         input_first_name = request.form.get("first_name")
@@ -998,7 +1001,7 @@ def update_profile_data():
         user_entry.last_name = input_last_name.lower()
         user_entry.gender = request.form.get("gender")
         user_entry.phone_number = request.form.get("phone_number")
-        user_entry.birth_date = date(year,month,day)
+        user_entry.birth_date = datetime.strptime(new_birthday , "%Y-%m-%d").date()
         user_entry.update_date = date.today()
         user_entry.adress = request.form.get("adress")
 
@@ -1067,7 +1070,9 @@ def deactivate_account():
                 auth_entry.active = False
                 db.session.commit()
                 session.clear()
-                return redirect(url_for("load_main_page"))
+                return jsonify({"success": True})
+        else:
+             return jsonify({"success": False})
         
 @app.route('/logout')
 def logout():

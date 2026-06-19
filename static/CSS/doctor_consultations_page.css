@@ -1,0 +1,62 @@
+body{
+    background-color:#F7F8FC;
+    font-family: "Segoe UI", sans-serif;
+    color: rgb(0, 0, 0);
+    margin: 0;
+    padding: 0;
+}
+.content{
+    border-style: none;
+    display: flex;
+    flex-direction: row;
+    min-height: 100vh;
+}
+.right_side{
+    gap: 20px;
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.container{
+    width: 33rem;
+    height: 30rem;
+    border: 3px solid rgb(0, 0, 0, 0.25);
+    border-radius: 13px;
+    padding: 10px;
+}
+.patients_list{
+    border: 3px solid rgb(0, 0, 0);
+    border-radius: 13px;
+    padding: 10px;
+    overflow-y: auto;
+    width: 25rem;
+    height: 10rem;
+}
+.consultations_list{
+    border: 3px solid rgb(0, 0, 0);
+    border-radius: 13px;
+    padding: 10px;
+    overflow-y: auto;
+    width: 26rem;
+    height: 14rem;
+}
+.patient_button{
+    width: 24rem;
+}
+.box{
+    border: 2px solid rgba(30, 127, 229,0.25);
+    border-radius: 13px;
+    padding: 10px;
+    background-color: rgb(240, 240, 240);
+}
+.edit_button{
+    text-decoration: none;
+    background-color:rgb(169, 169, 169);
+    color: white;
+    cursor: pointer;
+    padding: 3px;
+    border-style: solid;
+    border-color:rgb(119, 119, 119);
+    border-radius: 2px;
+}
