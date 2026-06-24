@@ -13,9 +13,12 @@ body{
 }
 .containers{
     display: flex;
+    flex: 1;
+    gap: 50px;
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    height: 80%;
 }
 .right_side{
     padding-left: 50px;
@@ -27,7 +30,7 @@ body{
     border-style: solid;
     border-color:rgba(54, 54, 54,0.25);
     width: 20rem;
-    height: 20rem;
+    height: 100%;
 }
 .consultations_list{
     padding: 10px;
@@ -61,14 +64,14 @@ body{
     text-align: center;
     border-style: solid;
     border-color:rgba(54, 54, 54,0.25);
-     border-radius: 15px;
-    height: 3.5rem;
+    border-radius: 15px;
+    height: 8rem;
     padding: 5px;
     background: rgba(90, 158, 236, 0.18);
 }
 .appointment_box{
     text-align: center;
-    height: 3.5rem;
+    height: 5rem;
     padding: 5px;
     background: rgba(21, 101, 192, 0.18);
     backdrop-filter: blur(12px);
@@ -82,4 +85,7 @@ body{
 #patient_search{
     width: 19.25rem;
     padding-left: 5px;
+}
+.patient_button{
+    cursor: pointer;
 }

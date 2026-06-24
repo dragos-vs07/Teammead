@@ -40,7 +40,7 @@
 
                                 {% endfor %}
                                 
-                                <button type ="submit" class ="input_box"><strong> Submit responses </strong></button>
+                                <button type ="submit" class ="input_box" ><strong> Submit responses </strong></button>
 
                                 </form>
 
@@ -59,11 +59,11 @@
                                     <div class="ap_box">
 
                                             <p> {{ap.patient.first_name}} {{ap.patient.last_name}} </p>
-                                            <p> {{ap.appointment_date}} </p>
+                                            <p> {{ap.appointment_date.strftime("%m/%d/%Y")}} </p>
 
                                     </div>
 
-                                    <hr class ="between_consultations">
+                                    
 
                                 {% endfor %}
 
@@ -85,7 +85,7 @@
 
                                                 <label>{{ day.title() }}:</label>
 
-                                                <input type="time" name="start_time_{{day}}" value ="{{s.start_time}}"  placeholder="hour" class="input_box">
+                                                <input type="time" name="start_time_{{day}}" value ="{{s.start_time}}"  placeholder="hour" class="input_box" >
 
                                                 -
 
@@ -95,7 +95,7 @@
                                         {% endfor %}
 
                                         
-                                        <button type ="submit" class ="input_box"><strong>Submit schedule</strong></button>
+                                        <button type ="submit" class ="input_box" ><strong>Submit schedule</strong></button>
                                     </form>
                                 </div>
                         </div>
@@ -118,7 +118,7 @@
                                     <br>
                                     <br>
 
-                                    <button type ="submit" class ="input_box"><strong>Submit unavailability</strong></button>
+                                    <button type ="submit" class ="input_box" ><strong>Submit unavailability</strong></button>
                                 </form>
 
                                 <br>
@@ -127,7 +127,7 @@
                                         {% for e in submitted_exceptions %}
                                                 <div class="ap_box">
 
-                                                    <p> {{e.start_date}} : {{e.start_time}} - {{e.end_date}} : {{e.end_time}} </p>
+                                                    <p> {{e.start_date.strftime("%m/%d/%Y")}} : {{e.start_time}} <strong>-</strong> {{e.end_date.strftime("%m/%d/%Y")}} : {{e.end_time}} </p>
 
                                                 </div>
                                         {% endfor %}

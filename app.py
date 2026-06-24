@@ -5,12 +5,111 @@ from dateutil.parser import parse
 from werkzeug.security import generate_password_hash , check_password_hash
 import os
 
+from dotenv import load_dotenv
+load_dotenv()
+
 app = Flask(__name__)
-app.secret_key = "g6fd58734hj]5gkh53489dsf87324.jhg234jh!!kg39081098374#"
+app.secret_key = os.getenv("SECRET_KEY")
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)  # not the database , but the controller of it    
+
+DIAGNOSES = [
+                "Healthy" ,
+                "Hypertension",
+                "Hypotension",
+                "Coronary Artery Disease",
+                "Heart Failure",
+                "Arrhythmia",
+                "Hyperlipidemia",
+
+                "Type 1 Diabetes",
+                "Type 2 Diabetes",
+                "Prediabetes",
+                "Obesity",
+                "Hypothyroidism",
+                "Hyperthyroidism",
+                "Metabolic Syndrome",
+
+                "Common Cold",
+                "Influenza",
+                "COVID-19",
+                "Acute Bronchitis",
+                "Pneumonia",
+                "Asthma",
+                "Chronic Obstructive Pulmonary Disease (COPD)",
+                "Allergic Rhinitis",
+                "Sinusitis",
+                "Pharyngitis",
+                "Tonsillitis",
+
+                "Gastroesophageal Reflux Disease (GERD)",
+                "Gastritis",
+                "Gastroenteritis",
+                "Irritable Bowel Syndrome (IBS)",
+                "Constipation",
+                "Diarrhea",
+                "Hemorrhoids",
+                "Peptic Ulcer Disease",
+
+                "Migraine",
+                "Tension Headache",
+                "Vertigo",
+                "Peripheral Neuropathy",
+
+                "Anxiety Disorder",
+                "Depression",
+                "Insomnia",
+                "Panic Disorder",
+
+                "Low Back Pain",
+                "Neck Pain",
+                "Osteoarthritis",
+                "Rheumatoid Arthritis",
+                "Tendinitis",
+                "Muscle Strain",
+                "Joint Pain",
+                "Sciatica",
+
+                "Acne",
+                "Eczema",
+                "Dermatitis",
+                "Psoriasis",
+                "Fungal Skin Infection",
+                "Cellulitis",
+                "Urticaria (Hives)",
+
+                "Urinary Tract Infection (UTI)",
+                "Kidney Stones",
+                "Chronic Kidney Disease",
+
+                "Otitis Media",
+                "Otitis Externa",
+                "Hearing Loss",
+                "Impacted Earwax",
+
+                "Viral Infection",
+                "Bacterial Infection",
+                "Fungal Infection",
+                "Conjunctivitis",
+
+                "Dysmenorrhea",
+                "Menopause",
+                "Polycystic Ovary Syndrome (PCOS)",
+                "Vaginitis",
+
+                "Benign Prostatic Hyperplasia (BPH)",
+                "Erectile Dysfunction",
+
+                "Routine Check-up",
+                "Follow-up Visit",
+                "Preventive Screening",
+                "Vaccination Visit",
+                "Medical Certificate Evaluation",
+                "Undiagnosed Condition",
+                "Referral Required"
+                ]
 
 # =========================
 # MODELS
@@ -213,21 +312,47 @@ def load_doctor_appointments_page():
                                         schedule = general_schedule
         )
 
+@app.route('/doctor_stats_page')
+def load_doctor_stats_page():
 
-@app.route('/patient_stats_page')
-def load_patient_stats_page():
-
-        if "user_id" not in session or session.get("role") != "patient":
+        if "user_id" not in session or session.get("role") != "doctor": # only doctor can access this
                return redirect(url_for("load_main_page"))
         
-        user = db.session.get(UserAuth, session.get("user_id"))
+        user = UserAuth.query.filter_by(id = session["user_id"]).first()
+        return render_template(
+                'doctor_stats_page.html' ,
+                consultations = [
+                        {
+                                "diagnostic": c.diagnostic,
+                                "consultation_date": c.consultation_date.strftime("%Y-%m-%d"),
+                                "weight": c.weight,
+                                "health_state": c.health_state,
+                                "blood_pressure_systolic": c.blood_pressure_systolic,
+                                "blood_pressure_diastolic": c.blood_pressure_diastolic,
+                                "blood_oxygen_saturation": c.blood_oxygen_saturation,
+                                "heart_rate": c.heart_rate,
+                        } 
+                        for c in user.doctor.consultations ]
+                );
 
-        weights = [float(c.weight) for c in user.patient.consultations if c.weight not in (None, '')]
-        health_states = [float(c.health_state) for c in user.patient.consultations if c.health_state not in (None, '')]
-        bps = [float(c.blood_pressure_systolic) for c in user.patient.consultations if c.blood_pressure_systolic not in (None, '')]
-        bpd = [float(c.blood_pressure_diastolic) for c in user.patient.consultations if c.blood_pressure_diastolic not in (None, '')]
-        spo2 = [float(c.blood_oxygen_saturation) for c in user.patient.consultations if c.blood_oxygen_saturation not in (None, '')]
-        heart_rates = [float(c.heart_rate) for c in user.patient.consultations if c.heart_rate not in (None, '')]
+@app.route('/patient_stats_page' , defaults = {"patient_id" : None})
+@app.route('/patient_stats_page/<int:patient_id>')
+def load_patient_stats_page(patient_id):
+
+        if "user_id" not in session :
+               return redirect(url_for("load_main_page"))
+        
+        if patient_id: # came from a doctor requesting
+                user = PatientInfo.query.filter_by(id = patient_id).first()
+        else: # came from a patient
+                user = UserAuth.query.filter_by(id = session.get("user_id")).first().patient
+
+        weights = [float(c.weight) for c in user.consultations if c.weight not in (None, '')]
+        health_states = [float(c.health_state) for c in user.consultations if c.health_state not in (None, '')]
+        bps = [float(c.blood_pressure_systolic) for c in user.consultations if c.blood_pressure_systolic not in (None, '')]
+        bpd = [float(c.blood_pressure_diastolic) for c in user.consultations if c.blood_pressure_diastolic not in (None, '')]
+        spo2 = [float(c.blood_oxygen_saturation) for c in user.consultations if c.blood_oxygen_saturation not in (None, '')]
+        heart_rates = [float(c.heart_rate) for c in user.consultations if c.heart_rate not in (None, '')]
 
         def s(lst):
                 if not lst:
@@ -248,7 +373,7 @@ def load_patient_stats_page():
                         "blood_pressure_diastolic": c.blood_pressure_diastolic,
                         "blood_oxygen_saturation": c.blood_oxygen_saturation,
                         "heart_rate": c.heart_rate,
-                } for c in user.patient.consultations],
+                } for c in user.consultations],
                 stats={
                         "weight": s(weights),
                         "health_state": s(health_states),
@@ -329,8 +454,15 @@ def load_edit_consultation_page(consultation_id):
         if "user_id" not in session or session.get("role") != "doctor": # only doctor can access this
                return redirect(url_for("load_main_page"))
         
+        user = UserAuth.query.filter_by(id = session.get("user_id")).first()
+        consultation = ConsultationInfo.query.filter_by(id = consultation_id).first()
+
+        if user.doctor.id !=  consultation.doctor.id:
+                return redirect(url_for("load_main_page"))
+        
         return render_template("edit_consultation_page.html",
-                               c = ConsultationInfo.query.filter_by(id = consultation_id).first()
+                               c = consultation ,
+                               diagnostics_list = DIAGNOSES 
                                )
 
 @app.route('/patient_info') # loads page for a patient user
@@ -399,50 +531,23 @@ def load_patient_result_page(patient_id):
 
         return render_template(
             "patient_result.html",
+            patient_id = patient_id ,
             first_name=query_patient.first_name.title(),
             last_name=query_patient.last_name.title(),
             birth_date=query_patient.birth_date,
             gender=query_patient.gender,
             email=query_patient.contact_email,
             phone_number=query_patient.phone_number,
-            consultations=[{ # making the consultations dictionaries so we can convert them to json for the javascript part
-                "id": c.id ,
-                "diagnostic": c.diagnostic,
-                "consultation_date": c.consultation_date,
-                "health_state": c.health_state ,
-                "weight": c.weight ,
-                "blood_pressure_systolic" : c.blood_pressure_systolic ,
-                "blood_pressure_diastolic" : c.blood_pressure_diastolic ,
-                "heart_rate" : c.heart_rate ,
-                "blood_oxygen_saturation" : c.blood_oxygen_saturation ,
-                "upload_file_path" : c.upload_file_path ,
-                "doctor_user_id" : c.doctor.user_id
-            }
-            for c in ConsultationInfo.query.filter_by( patient_id = query_patient.id , doctor_id = user.doctor.id ).all()
-            ] , 
+            adress = query_patient.adress ,
+            age = ( date.today().year - query_patient.birth_date.year
+                - ((date.today().month, date.today().day) < (query_patient.birth_date.month, query_patient.birth_date.day))
+                ) ,
+            consultations = query_patient.consultations ,
+            diagnostic_list = DIAGNOSES , 
             update_date=date.today() ,
         )
-@app.route('/find_doctor/<int:doctor_id>' )
-def load_doctor_result_page(doctor_id):
 
-        if "user_id" not in session or session.get("role") != "patient": # only doctor can access this
-               return redirect(url_for("load_main_page"))
-        
-        doctor = DoctorInfo.query.filter_by(id = doctor_id ).first()
 
-        if not doctor :
-                flash("doctor not found")
-                return redirect(url_for("load_patient_page"))
-        
-        return render_template( 
-                "doctor_result.html" , 
-                first_name = doctor.first_name ,
-                last_name = doctor.last_name ,
-                specialisation = doctor.specialisation ,
-                contact_email = doctor.contact_email ,
-                phone_number = doctor.phone_number ,
-                adress = doctor.adress             
-        )
 @app.route('/patient_make_appointment_page/<int:doctor_id>')
 def load_patient_make_appointment_page(doctor_id):
 
@@ -829,7 +934,6 @@ def register_appointment():
                          return ERROR_MESSAGE , 400;
           
 
-        print("HERE:" , data['date'])
         new_appointment = AppointmentInfo(
                 doctor_id = data["doctor_id"] ,
                 patient_id = PatientQuery.id ,
@@ -847,18 +951,18 @@ def register_appointment():
         })
         
 
-@app.route('/reg_consultation' , methods=["POST"])  # adds new consultation to database
-def submit_consultation():
+@app.route('/reg_consultation/<int:patient_id>' , methods=["POST"])  # adds new consultation to database
+def submit_consultation(patient_id):
 
         if "user_id" not in session or session.get("role") != "doctor": # only doctor can access this
                return redirect(url_for("load_main_page"))
          
         doc = DoctorInfo.query.filter_by(user_id=session.get("user_id")).first()
-        pat = PatientInfo.query.filter_by(id=session.get("patient_id")).first()
+        pat = PatientInfo.query.filter_by(id=patient_id).first()
 
         if not pat :
                 flash("No patient found")
-                return redirect(url_for("load_patient_result_page"))
+                return redirect(url_for("load_patient_result_page" , patient_id = patient_id))
 
         first_name = pat.first_name.lower()
         last_name = pat.last_name.lower()
@@ -873,17 +977,17 @@ def submit_consultation():
                 file_path = os.path.join( folder_path , file.filename )
                 file.save(file_path)
 
-        date = request.form.get("consultation_date")
+        date = request.form.get("date")
 
         if not date:
                 flash("Must set the date of the consultation")
-                return redirect(url_for("load_patient_result_page"))
+                return redirect(url_for("load_patient_result_page" , patient_id = patient_id))
         
         diagnostic = request.form.get("diagnostic")
 
         if not diagnostic :
                 flash("Must confirm a diagnostic")
-                return redirect(url_for("load_patient_result_page"))
+                return redirect(url_for("load_patient_result_page" , patient_id = patient_id))
         
         new_consultation = ConsultationInfo(
                 diagnostic=request.form.get("diagnostic"),
@@ -897,23 +1001,27 @@ def submit_consultation():
                 doctor_id=doc.id,
                 patient_id=pat.id,
                 upload_file_path=file_path,
-                update_date = date.today()
+                update_date = datetime.today()
         )
         
         db.session.add(new_consultation)
         db.session.commit()
 
-        return redirect(url_for("load_patient_result_page"))
+        return redirect(url_for("load_patient_result_page" , patient_id = patient_id))
 
 
 @app.route('/change_consultation/<consultation_id>' , methods=["POST"])
 def apply_changes(consultation_id):
 
-        if "user_id" not in session:
+        if "user_id" not in session or session.get("role") != "doctor":
                 return redirect(url_for("load_main_page"))
         
         consultation = ConsultationInfo.query.get_or_404(consultation_id)
-
+        user = UserAuth.query.filter_by(id = session.get("user_id")).first()
+        
+        if user.doctor.id != consultation.doctor.id :
+                return redirect(url_for("load_main_page"))
+        
         consultation.weight = request.form.get("weight")
         consultation.health_state = request.form.get("health_state")
         consultation.blood_pressure_systolic = request.form.get("blood_pressure_systolic") 
@@ -950,6 +1058,13 @@ def download_attachment(consultation_id):
                 return redirect(url_for("load_main_page"))
         
         consultation = ConsultationInfo.query.get_or_404(consultation_id)
+        user = UserAuth.query.filter_by(id = session.get("user_id")).first()
+        
+        if session.get("role") == "doctor" and user.doctor.id != consultation.doctor.id:
+                return redirect(url_for("load_main_page"))
+        elif session.get("role") == "patient" and user.patient.id != consultation.patient.id:
+                return redirect(url_for("load_main_page"))
+        
         return send_file(consultation.upload_file_path, as_attachment=True)
 
 

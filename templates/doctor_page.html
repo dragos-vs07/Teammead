@@ -14,12 +14,13 @@
                     
                     <div class = "right_side">
                              
-                            <h2 style="color:rgb(71, 71, 71)">Information for doctor {{ first_name }} {{ last_name }} </h2>
+                            <h2 style="color:rgb(71, 71, 71)">Information for Dr. {{ first_name.title() }} {{ last_name.title() }} </h2>
 
                             <br>
                             <br>
 
                         <div class ="containers">
+
                             <div class ="container">
 
                                 <h3 style="color:rgb(71, 71, 71)">Latest consultations:</h3>
@@ -27,9 +28,9 @@
                                 <div class ="consultations_list">
                                     {% for c in consultations %}
                                         <div class ="consultation_box">
-                                            {{c.patient.first_name.title()}} {{c.patient.last_name.title()}}
-                                            {{c.diagnostic.title()}}
-                                            {{c.consultation_date}}
+                                            <p><strong>{{c.patient.first_name.title()}} {{c.patient.last_name.title()}}</strong></p>
+                                            <p>{{c.diagnostic.title()}}</p>
+                                            <p>{{c.consultation_date.strftime("%d %B %Y")}}</p>
                                         </div>
                                     {% endfor %}
                                 </div>
@@ -42,8 +43,8 @@
                                 <div class ="appointments_list">
                                     {% for a in appointments %}
                                         <div class ="appointment_box">
-                                            {{a.patient.first_name.title()}} {{a.patient.last_name.title()}}
-                                            {{a.appointment_date}}
+                                            <p><strong>{{a.patient.first_name.title()}} {{a.patient.last_name.title()}}</strong></p>
+                                            <p>{{a.appointment_date.strftime("%d %B %Y")}}</p>
                                         </div>
                                     {% endfor %}
                                 </div>

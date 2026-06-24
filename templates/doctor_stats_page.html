@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='CSS/doctor_stats_page.css') }}">
+        <link rel ="stylesheet" href = "{{ url_for('static', filename='CSS/sidebar.css') }}">
+        <title>Teammed</title>
+    </head>
+    <body>
+
+            <div class ="content">
+
+                    {% include "sidebar.html" %}
+
+                    <div class ="right_side">
+                            
+                            <div class ="diagnose_area">
+                                
+                                <div class ="filter_box">
+                                        <select name="timerange" id="timerange_diagnose_chart">
+                                                <option value="-1">All time</option>
+                                                <option value="365">Last year</option>
+                                                <option value="180">Last 6 months</option>
+                                                <option value="90">Last 3 months</option>
+                                                <option value="30">Last month</option>
+                                                <option value="7">Last week</option>
+                                        </select>
+                                </div>
+
+                                <div class ="chart" id="diagnose_chart"></div>
+                                
+                            </div>
+
+                            <div class ="consultations_area">
+                                
+                                <div class ="filter_box">
+
+                                        <select name="timerange" id="timerange_consultations_chart">
+                                                <option value="-1">All time</option>
+                                                <option value="365">Last year</option>
+                                                <option value="180">Last 6 months</option>
+                                                <option value="90">Last 3 months</option>
+                                                <option value="30">Last month</option>
+                                                <option value="7">Last week</option>
+                                        </select>
+                                        
+                                </div>
+
+                                <div class ="chart" id="consultations_chart"></div>
+
+                            </div>
+                    </div>
+            </div>
+                    
+            
+            <script src = "{{ url_for('static' , filename = 'JavaScript/sidebar.js') }}"></script>
+            <script> const consultations_list = {{ consultations | tojson | safe }};</script> 
+            <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+            <script src = "{{ url_for('static' , filename = 'JavaScript/doctor_stats_page.js') }}"></script>
+
+    </body>
+
+</html>

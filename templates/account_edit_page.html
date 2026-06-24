@@ -26,7 +26,7 @@
                                             <input type="text"  name="new_email"  placeholder = "New Email" value = "{{old_email}}"  class ="input_box">
                                             <br>
                                             <br>
-                                            <button type = "button" class ="input_box" onclick = "open_password_change_window()"><strong>Submit changes</strong></button>
+                                            <button type = "button" class ="input_box" onclick = "open_password_change_window()" style="cursor:pointer;"><strong>Submit changes</strong></button>
                                             <br>
                                             <br>
                                     </form>
@@ -35,8 +35,8 @@
 
                                             <p>In order to change authentification data , please confirm your current password</p>
                                             <input type="text" id ="old_password" placeholder ="Enter password" class ="input_box">
-                                            <button onclick = "submit_password_change()" class ="input_box">Confirm</button>
-                                            <button onclick = "close_password_change_window()" class ="input_box">Cancel</button>
+                                            <button onclick = "submit_password_change()" class ="input_box" style="cursor: pointer;">Confirm</button>
+                                            <button onclick = "close_password_change_window()" class ="input_box" style="cursor: pointer;">Cancel</button>
                                     </div>
                             </div>
 
@@ -130,7 +130,7 @@
                                                 <br>
                                                 <br>
 
-                                                <button type ="submit" class ="input_box"><strong>Submit changes</strong></button>
+                                                <button type ="submit" class ="input_box" style="cursor:pointer;"><strong>Submit changes</strong></button>
                                             </form>
                                             
                                                 <br>
@@ -143,10 +143,10 @@
                                         <p>Are you sure you want to deactivate your account?</p>
                                         <p>All your appointments will be canceled and only an administrator can reactivate your account</p>
 
-                                        <input type="text" id="confirm_password" placeholder="Enter password">
+                                        <input type="text" id="confirm_password" placeholder="Enter password" >
 
-                                        <button onclick = "submit_deactivation()">Confirm</button>
-                                        <button onclick = "close_confirm_window()">Cancel</button>
+                                        <button onclick = "submit_deactivation()" style="cursor: pointer;">Confirm</button>
+                                        <button onclick = "close_confirm_window()" style="cursor: pointer;">Cancel</button>
 
                                 </div>
 

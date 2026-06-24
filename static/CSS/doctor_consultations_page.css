@@ -19,14 +19,18 @@ body{
     align-items: center;
 }
 .container{
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
     width: 33rem;
     height: 30rem;
-    border: 3px solid rgb(0, 0, 0, 0.25);
+    border: 3px solid rgb(0, 0, 0, 0.35);
     border-radius: 13px;
     padding: 10px;
 }
 .patients_list{
-    border: 3px solid rgb(0, 0, 0);
+    border: 3px solid rgba(102, 102, 102,0.25);
     border-radius: 13px;
     padding: 10px;
     overflow-y: auto;
@@ -37,15 +41,16 @@ body{
     display: flex;
     flex-direction: column;
     gap: 5px;
-    border: 3px solid rgb(0, 0, 0);
+    border: 3px solid rgba(102, 102, 102,0.25);
     border-radius: 13px;
     padding: 10px;
     overflow-y: auto;
     width: 26rem;
-    height: 14rem;
+    height: 74%;
 }
 .patient_button{
-    width: 24rem;
+    width: 100%;
+    cursor: pointer;
 }
 .box{
     border: 2px solid rgba(30, 127, 229,0.25);
@@ -66,4 +71,5 @@ body{
 #patient_search{
     width: 26rem;
     padding-left: 5px;
+    
 }

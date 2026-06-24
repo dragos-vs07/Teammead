@@ -18,52 +18,9 @@ body{
     justify-content: center;
     align-items: center;
 }
-.logo{
-    display: flex;
-    justify-content: center;
-    padding-top: 25%;
-    padding-bottom: 25%;
-}
-.sidebar{
-    background: linear-gradient( to bottom , rgb(0, 60, 106) , rgb(106, 195, 255) );
-    flex: 0 0 200px; /* fixed sidebar */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-bottom: 15px;   
-    border-left: 2px  solid  #4f4f4f ;
-}
-.sidebar_button{
-    width:50%;
-   cursor: pointer;
-   color: white;
-   background: rgba(0, 14, 58, 0.12);
-   backdrop-filter: blur(12px);
-   -webkit-backdrop-filter: blur(12px); 
-   border: 1px solid rgba(255, 255, 255, 0.25);
-   border-radius: 16px;
-   padding: 12px;
-}
-#logout_button{
-   margin-top: auto;
-}
-.second_half{
-    font-weight: bold;
-    color:rgb(17, 109, 190);
-    font-size: 2rem;
-    padding: 3px;
-    
-}
-.third_half{
-    font-weight: bold;
-    background-color:rgb(141, 159, 172);
-    border-radius: 5px;
-    color:rgb(0, 60, 100);
-    padding: 3px;
-    font-size: 2rem;
-}
 .doctor_search_list{
-    border: 3px solid rgb(0, 0, 0);
+    background-color: white;
+    border: 3px solid rgba(62, 62, 62,0.5);
     border-radius: 13px;
     padding: 10px;
     overflow-y: auto;
@@ -71,7 +28,8 @@ body{
     height: 10rem;
 }
 .appointments_list{
-    border: 3px solid rgb(0, 0, 0);
+    background-color: white;
+    border: 3px solid rgba(62, 62, 62,0.5);
     border-radius: 13px;
     padding: 10px;
     overflow-y: auto;
@@ -125,4 +83,7 @@ body{
 }
 #doctor_search{
     width: 26rem;
+}
+.doctor_button{
+    cursor: pointer;
 }

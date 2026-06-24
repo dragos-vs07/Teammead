@@ -35,8 +35,9 @@
                                     <div class ="consultations_list">
                                         {% for c in consultations %}
                                             <div class ="box">
-                                                    <p>{{c.patient.first_name.title()}} {{c.patient.last_name.title()}}</p>
+                                                    <p><strong>{{c.patient.first_name.title()}} {{c.patient.last_name.title()}}</strong></p>
                                                     <p>{{c.diagnostic.title()}}</p>
+                                                    <p>{{c.consultation_date.strftime("%m/%d/%Y")}}</p>
                                                     <button class ="edit_button" type ="button" onclick = "window.location.href ='/load_edit_consultation_page/{{c.id}}'">
                                                     Edit
                                                     </button>

@@ -17,19 +17,30 @@
 
                         <h3> My consultations </h3>
 
-                        <div class ="upper_area">
                             <div class ="consultation_container">
                                 {% for c in user.patient.consultations | reverse %}
                                     <div class ="consultation_box">
                                 
-                                        <p> Dr. {{c.doctor.first_name.title()}} {{c.doctor.last_name.title()}} </p>
-                                        <p> date: {{c.consultation_date.strftime("%d-%m-%Y")}} </p>
-                                        <p> diagnostic: {{c.diagnostic}} </p>
-                                        <p> health state: {{c.health_state}} </p>
-                                        <p> heart rate: {{c.heart_rate}}</p>
-                                        <p> weight: {{c.weight}} </p>
-                                        <p> blood pressure: {{c.blood_pressure_systolic}} / {{c.blood_pressure_diastolic}} </p>
-                                        <p> SpO<sub>2</sub>: {{c.blood_oxygen_saturation}} % </p>
+                                        <p> <strong>Dr. {{c.doctor.first_name.title()}} {{c.doctor.last_name.title()}} </strong> </p>
+                                        <p> {{c.consultation_date.strftime("%d %B %Y")}} </p>
+                                        <p> Diagnostic: <strong>{{c.diagnostic}}</strong> </p>
+                                        <p> Health state: {{c.health_state}} </p>
+
+                                        {% if c.heart_rate %}
+                                            <p> Heart rate:  {{c.heart_rate}} BPM</p>
+                                        {% endif %}
+
+                                        {% if c.weight %}
+                                            <p> Weight: {{c.weight}} kg</p>
+                                        {% endif %}
+
+                                        {% if c.blood_pressure_systolic %}
+                                            <p> Blood pressure:  {{c.blood_pressure_systolic}} mmHg / {{c.blood_pressure_diastolic}} mmHg </p>
+                                        {% endif %}
+
+                                        {% if c.blood_oxygen_saturation %}
+                                            <p> SpO<sub>2</sub>:    {{c.blood_oxygen_saturation}} % </p>
+                                        {% endif %}
 
                                         {% if c.upload_file_path is not none %}
                                             <a href="{{ url_for('download_attachment', consultation_id = c.id) }}">
@@ -40,13 +51,11 @@
                                         {% endif %}
 
                                     </div>
-                                    <hr class ="between_consultations">
+                                    
                                 {% endfor %}
 
                             </div>
 
-                        </div>
-                        
                 </div>
         </div>
             <script src = "{{ url_for('static' , filename = 'JavaScript/sidebar.js') }}"></script>

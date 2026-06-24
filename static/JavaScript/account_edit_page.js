@@ -26,7 +26,7 @@ function submit_deactivation()
 }
 function open_password_change_window()
 {
-    document.getElementById("old_password_required_window").style.display = "block";
+    document.getElementById("old_password_required_window").style.display = "flex";
 }
 function close_password_change_window()
 {

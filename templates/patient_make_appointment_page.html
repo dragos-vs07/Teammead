@@ -20,15 +20,24 @@
                                         
                                         <div id="calendar"></div> <!-- display the chosen doctors' schedule -->
                                     </div>
+                                
+                                <div class = "big_cont">
+                                    <div class ="doctor_info_container">
+                                        <h3> <strong>Contact</strong> </h3>
 
+                                            <p> <strong>Email:</strong> {{doctor.contact_email}}</p>
+                                            <p> <strong>Phone number:</strong> {{doctor.phone_number}}</p>
+                                    </div>
                                     <div id="appointment_panel">
+
+                                            
 
                                             <div class ="panel_content">
 
                                                 <div id ="main_text"></div>
 
                                                 <br>
-                                                
+                                            
                                                 <div class ="time_segments_container">
                                                        {% for day in range(0,7) %}
                                                             <div id = "{{day}}_segments" style ="display:none" >
@@ -43,6 +52,7 @@
 
                                             </div>
                                     </div>
+                                </div>
 
                                     
                     <div id="modal_box">

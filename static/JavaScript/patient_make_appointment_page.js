@@ -13,7 +13,24 @@ let previous_day = null;
 
 let selected_date = null;
 
+function CreateDate(datestr)
+{
+     date = new Date(datestr);
+     const months = [
+     "January", "February", "March", "April",
+     "May", "June", "July", "August",
+     "September", "October", "November", "December"
+     ];
 
+const formatted = 
+  String(date.getDate()).padStart(2, "0") +
+  " " +
+  months[date.getMonth()] +
+  " " +
+  date.getFullYear();
+
+  return formatted;
+}
 function blocked(dateStr, timeStr) {
      
      console.log(exceptions_list);
@@ -39,6 +56,9 @@ function blocked(dateStr, timeStr) {
 }
 
 function ClickCell(info) {
+
+    document.getElementById("make_appointment_button").style.display = "none";
+
     const events = calendar.getEvents().filter(e =>
         e.startStr.startsWith(info.dateStr)
     );
@@ -66,7 +86,7 @@ function ClickCell(info) {
     });
 
     document.getElementById("appointment_panel").style.display = "block";
-    document.getElementById("main_text").textContent = "Book an appointment for " + info.dateStr;
+    document.getElementById("main_text").innerHTML = "<h3>Book an appointment for " + CreateDate(info.dateStr) + "</h3>";
     segDiv.style.display = "flex";
 
     previous_cell = info.dayEl;
@@ -101,7 +121,6 @@ function selectTimeSegment(this_button)
 {
      selected_time = this_button.textContent;
 
-     document.getElementById("make_appointment_button").style.display = "block";
      document.getElementById("make_appointment_button").style.display = "block";
 
      if (previous_button)

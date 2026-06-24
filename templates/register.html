@@ -6,85 +6,88 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='CSS/register_page.css') }}">
     </head>
     <body>
-            <h2>Register</h2>
-            <form method = "POST" action ="/submit_register">
-                
-                <label>Username:</label>
-                <input type="text"  name="username">
+        <div class ="container">
+            <h2 style="color:white;">Register</h2>
 
-                <br>
-                <br>
+            <div class ="form_container">
+                <form method = "POST" action ="/submit_register">
+                    
+                    <label>Username:</label>
+                    <input type="text"  name="username" class ="input_box">
 
-                <label >Password:</label>
-                <input type ="text"  name="password">
+                    <br>
+                    <br>
 
-                <br>
-                <br>
+                    <label >Password:</label>
+                    <input type ="text"  name="password" class ="input_box">
 
-                <label> Email: </label>
-                <input type="text"  name="email">
+                    <br>
+                    <br>
 
-                <br>
-                <br>
+                    <label> Email: </label>
+                    <input type="text"  name="email" class ="input_box">
 
-                <label >First Name:</label>
-                <input type ="text"  name="first_name">
+                    <br>
+                    <br>
 
-                <br>
-                <br>
+                    <label >First Name:</label>
+                    <input type ="text"  name="first_name" class ="input_box">
 
-                <label >Last Name:</label>
-                <input type ="text"  name="last_name">
+                    <br>
+                    <br>
 
-                <br>
-                <br>
+                    <label >Last Name:</label>
+                    <input type ="text"  name="last_name" class ="input_box">
 
-                 <label>Gender:</label>
-                <input type ="radio"  name="gender" value="male">
-                Male
-                </label>
+                    <br>
+                    <br>
 
-                <label >
-                <input type ="radio"  name="gender" value="female">
-                Female
-                </label>
+                    <label>Gender:</label>
+                    <input type ="radio"  name="gender" value="male">
+                    Male
+                    </label>
 
-                <br>
-                <br>
+                    <label >
+                    <input type ="radio"  name="gender" value="female">
+                    Female
+                    </label>
 
-                <label>Date of birth:</label>
-                <input type ="date"  name="birth_date" >
+                    <br>
+                    <br>
 
-                <br>
-                <br>
+                    <label>Date of birth:</label>
+                    <input type ="date"  name="birth_date" class ="input_box">
 
-                <label> Contact email: </label>
-                <input type="text"  name="contact_email">
+                    <br>
+                    <br>
 
-                <br>
-                <br>
+                    <label> Contact email: </label>
+                    <input type="text"  name="contact_email" class ="input_box">
 
-                <label> Phone number: </label>
-                <input type="text"  name="phone_number">
+                    <br>
+                    <br>
 
-                <br>
-                <br>
+                    <label> Phone number: </label>
+                    <input type="text"  name="phone_number" class ="input_box">
 
-                <label >Are you a doctor?</label>
-                <input type ="checkbox"  name="is_doctor">
+                    <br>
+                    <br>
 
-                <br>
-                <br>
+                    <label >Are you a doctor?</label>
+                    <input type ="checkbox"  name="is_doctor">
 
-                <button type ="submit">Submit</button>
-            </form>
-            
+                    <br>
+                    <br>
+
+                    <button type ="submit">Submit</button>
+                </form>
+            </div>
+
             {% for message in get_flashed_messages() %}
                 <p>{{message}}</p>
             {% endfor %}
-                 
-
             
+        </div>
     </body>
 
 </html>

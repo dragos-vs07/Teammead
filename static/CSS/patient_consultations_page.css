@@ -7,71 +7,39 @@ body{
 }
 .consultation_container{
     
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
     width: 50%;
     border-style: solid;
-    border-color:rgb(86, 86, 86);
-    max-height: 350px;
+    border-color:rgba(142, 142, 142, 0.3);
+    border-radius: 13px;
+    max-height: 330px;
     overflow-y: auto;
+    gap: 10px;
     
 }
 .consultation_box{
     padding-left: 10px;
+    background-color: white;
+    border-radius: 13px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: rgb(0, 60, 106,0.35);
+    padding: 10px;
 }
-.between_consultations{
-    height: 5px;
-    background-color:rgb(182, 178, 178);
-}
-.logo{
-    display: flex;
-    justify-content: center;
-    padding-top: 25%;
-    padding-bottom: 25%;
-}
-.sidebar{
-    background: linear-gradient( to bottom , rgb(0, 60, 106) , rgb(106, 195, 255) );
-    flex: 0 0 200px; /* fixed sidebar */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-bottom: 15px;   
-    border-left: 2px  solid  #4f4f4f ;
-}
+
 .content{
     border-style: none;
     display: flex;
     flex-direction: row;
     min-height: 100vh;
 }
-.second_half{
-    font-weight: bold;
-    color:rgb(17, 109, 190);
-    font-size: 2rem;
-    padding: 3px;
-    
-}
-.third_half{
-    font-weight: bold;
-    background-color:rgb(141, 159, 172);
-    border-radius: 5px;
-    color:rgb(0, 60, 100);
-    padding: 3px;
-    font-size: 2rem;
-}
 .right_side{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     flex: 1;
     padding: 10px;
-}
-#logout_button{
-   margin-top: auto;
-}
-.sidebar_button{
-    width:50%;
-   cursor: pointer;
-   color: white;
-   background: rgba(0, 14, 58, 0.12);
-   backdrop-filter: blur(12px);
-   -webkit-backdrop-filter: blur(12px); 
-   border: 1px solid rgba(255, 255, 255, 0.25);
-   border-radius: 16px;
-   padding: 12px;
 }

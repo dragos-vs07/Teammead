@@ -46,14 +46,14 @@
                                                                         {% if ap.doctor.specialisation %}
                                                                          <p>{{ap.doctor.specialisation.title()}}</p>
                                                                         {% endif %}
-                                                                        <p>{{ap.appointment_date}}</p>
+                                                                        <p>{{ap.appointment_date.strftime("%m/%d/%Y")}}</p>
 
                                                                         {% if ap.confirmation == 1 %}
-                                                                            <p>Confirmed</p>
+                                                                            <strong>Confirmed</strong>
                                                                         {% elif ap.confirmation == 0 %}
-                                                                            <p>Pending</p>
+                                                                            <strong>Pending</strong>
                                                                         {% else %}
-                                                                            <p>Rejected</p>
+                                                                            <strong>Rejected</strong>
                                                                         {% endif %}
                                                                 </div>
                                                         {% endfor %}

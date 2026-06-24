@@ -3,66 +3,84 @@
 <html>
     <head>
         <link rel="stylesheet" href="{{ url_for('static', filename='CSS/edit_consultation_page.css') }}">
+        <link rel ="stylesheet" href = "{{ url_for('static', filename='CSS/sidebar.css') }}">
         <title>Teammed</title>
     </head>
     <body>
-            <h2>Edit consultation </h2>
-        
-            <br>
-            <br>
-         
-            <form method ="POST" action ="/change_consultation/{{c.id}}" enctype="multipart/form-data">
+
+            <div class ="content">
+
+                 {% include "sidebar.html" %}
+
+                    <div class ="right_side">
+                        <h2>Edit consultation </h2>
+                
+                        <br>
+
+                        <div class ="form_container">
+                            <form method ="POST" action ="/change_consultation/{{c.id}}" enctype="multipart/form-data">
 
 
-                            <label>Diagnostic:</label>
-                            <input type ="text"  name="diagnostic" value = "{{c.diagnostic}}" class ="input_box">
+                                <label>Diagnostic:</label>
+                                <select  name="diagnostic" value = "{{c.diagnostic}}" class ="input_box">
 
-                            <br>
-                            <br>
+                                    {% for d in diagnostics_list %}
+                                        <option value = "{{d}}">{{d}}</option>
+                                    {% endfor %}
 
-                            <label>Date:</label>
-                            <input type ="date"  name="date" value = "{{c.consultation_date}}" class ="input_box">
+                                </select>
 
-                            <br>
-                            <br>
+                                <br>
+                                <br>
 
-                            <label >Weight:</label>
-                            <input type ="number"  name="weight" value = "{{c.weight}}" class ="input_box">
+                                <label>Date:</label>
+                                <input class ="input_box" type ="date"  name="date" value = "{{c.consultation_date}}" class ="input_box">
 
-                            <br>
-                            <br>
+                                <br>
+                                <br>
 
-                            <label >Health state:</label>
-                            <input type ="number"  name="health_state" min = 0 max = 10  value = "{{c.health_state}}" class ="input_box">
+                                <label >Weight:</label>
+                                <input class ="input_box" type ="number"  name="weight" value = "{{c.weight}}" class ="input_box">
 
-                            <br>
-                            <br>
+                                <br>
+                                <br>
 
-                            <label >Heart rate:</label>
-                            <input type ="number"  name="heart_rate" class ="input_box" value = "{{c.heart_rate}}" >
+                                <label >Health state:</label>
+                                <input class ="input_box" type ="number"  name="health_state" min = 0 max = 10  value = "{{c.health_state}}" class ="input_box">
 
-                            <br>
-                            <br>
+                                <br>
+                                <br>
 
-                            <label >Blood pressure:</label>
-                            <input type ="number"  name="blood_pressure_systolic"  value = "{{c.blood_pressure_systolic}}" class ="input_box"> /
-                            <input type ="number"  name="blood_pressure_diastolic"  value = "{{c.blood_pressure_diastolic}}" class ="input_box">
+                                <label >Heart rate:</label>
+                                <input class ="input_box" type ="number"  name="heart_rate" class ="input_box" value = "{{c.heart_rate}}" >
 
-                            <br>
-                            <br>
+                                <br>
+                                <br>
 
-                            <label >SpO<sub>2:</label>
-                            <input type ="number"  name="blood_oxygen_saturation" min = 0 max = 100   class ="input_box" value ="{{c.blood_oxygen_saturation}}">
+                                <label >Blood pressure:</label>
+                                <input class ="input_box" type ="number"  name="blood_pressure_systolic"  value = "{{c.blood_pressure_systolic}}" class ="input_box"> /
+                                <input class ="input_box" type ="number"  name="blood_pressure_diastolic"  value = "{{c.blood_pressure_diastolic}}" class ="input_box">
 
-                            <br>
-                            <br>
-                            
-                            <button type ="submit" class ="input_box">Submit</button>
+                                <br>
+                                <br>
 
-            </form>
-            {% for message in get_flashed_messages() %}
-                <p>{{message}}</p>
-            {% endfor %}
+                                <label >SpO<sub>2:</label>
+                                <input class ="input_box" type ="number"  name="blood_oxygen_saturation" min = 0 max = 100   class ="input_box" value ="{{c.blood_oxygen_saturation}}">
+
+                                <br>
+                                <br>
+                                
+                                <button type ="submit" class ="input_box"><strong>Submit changes</strong></button>
+
+                            </form>
+                        </div>
+                        {% for message in get_flashed_messages() %}
+                            <p>{{message}}</p>
+                        {% endfor %}
+                    </div>
+            </div>
+
+            <script src = "{{ url_for('static' , filename = 'JavaScript/sidebar.js') }}"></script>
     </body>
 
 </html>
