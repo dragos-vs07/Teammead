@@ -36,13 +36,6 @@
                                                 <p> <b> Dr. </b>  {{c.doctor_first_name.title()}} {{c.doctor_last_name.title()}}  {{c.doctor_specialisation}}   </p>
                                                     <b> {{c.diagnostic.title()}} </b>
 
-                                                {% if c.upload_file_path is not none %}
-                                                    <a href="{{ url_for('download_attachment', consultation_id = c.id) }}">
-                                                        <button class ="download_button">
-                                                            download attachment
-                                                        </button>
-                                                    </a>
-                                                {% endif %}
                                                 
                                             </div>
 
