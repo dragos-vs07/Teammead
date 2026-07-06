@@ -24,18 +24,21 @@ body{
     padding-left: 50px;
 }
 .container{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     padding: 10px;
     background-color:#e7e7e7;
     border-radius: 15px;
     border-style: solid;
     border-color:rgba(54, 54, 54,0.25);
     width: 20rem;
-    height: 100%;
 }
 .consultations_list{
     padding: 10px;
     display: flex;
     flex-direction: column;
+    flex: 1;
     gap: 5px;
     background-color:#ffffff;
     border-radius: 15px;
@@ -43,20 +46,20 @@ body{
 .appointments_list{
     display: flex;
     flex-direction: column;
+    flex: 1;
     gap: 5px;
     background-color:#ffffff;
     padding: 10px;
-    height: 14rem;
     border-radius: 15px;
 }
 .patients_list{
+     display: flex;
+    flex-direction: column;
+    flex: 1;
     padding: 5px;
     border-radius: 15px;
     border-style: solid;
     border-color:rgba(54, 54, 54,0.25);
-    height: 12rem;
-    display: flex;
-    flex-direction: column;
     gap: 5px;
     background-color:#ffffff;
 }
@@ -71,7 +74,7 @@ body{
 }
 .appointment_box{
     text-align: center;
-    height: 5rem;
+    height: 25%;
     padding: 5px;
     background: rgba(21, 101, 192, 0.18);
     backdrop-filter: blur(12px);

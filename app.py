@@ -232,7 +232,6 @@ class AppointmentInfo(db.Model):
         patient_id = db.Column(db.Integer, db.ForeignKey("patient_info.id"))
         appointment_date = db.Column(db.DateTime , nullable = False ) # stores date and time segment at which it starts ( time can only be xx:00 or xx:30 )
         confirmation = db.Column(db.Integer , nullable = False) # -1 rejected , 0 pending , 1 accepted ( doctor does this )
-        status = db.Column(db.String(30) , nullable = False) # finished , cancelled , upcoming
         update_date = db.Column(db.Date)
         
         patient = db.relationship(
@@ -274,6 +273,12 @@ class DoctorException(db.Model): # stores blocked time segments where patients c
 def create_string_date( day , month , year):
         return f"{day}-{month}-{year}"
 
+def check_appointment_confirmation(appointments):
+        for ap in appointments :
+                if ap.appointment_date < datetime.today() and ap.confirmation == 0:
+                        ap.confirmation = -1
+
+        db.session.commit()
 # =========================
 # LOADING PAGES 
 # =========================
@@ -292,16 +297,20 @@ def load_doctor_appointments_page():
 
         general_schedule = DoctorSchedule.query.filter_by(doctor_id = user.doctor.id).order_by(DoctorSchedule.day).all()
 
+        aux = AppointmentInfo.query.filter_by(
+                                        doctor_id = user.doctor.id ,
+                                        confirmation = 1 ,
+                                        status = "upcoming" ).all()
+        
+        check_appointment_confirmation(aux)
+
         return render_template(         "doctor_appointments_page.html" ,
                                         current_datetime = datetime.now().strftime("%Y-%m-%dT%H:%M") ,
                                         pending_appointments = AppointmentInfo.query.filter_by(
                                         doctor_id = user.doctor.id ,
                                         confirmation = 0 ).all() , # appointments not accepted / rejected yet
                                         
-                                        upcoming_appointments = AppointmentInfo.query.filter_by(
-                                        doctor_id = user.doctor.id ,
-                                        confirmation = 1 ,
-                                        status = "upcoming" ).all() , # appointments accepted and that are on the way
+                                        upcoming_appointments = aux , # appointments accepted and that are on the way
 
                                         submitted_exceptions = DoctorException.query.filter(
                                                 DoctorException.doctor_id == user.doctor.id ,
@@ -403,9 +412,12 @@ def load_patient_appointments_page():
         
         user = UserAuth.query.filter_by( id = session["user_id"] ).first()
 
+        aux = AppointmentInfo.query.filter_by( patient_id = user.patient.id ,  ).all()
+        check_appointment_confirmation(aux)
+
         return render_template("patient_appointments_page.html" ,
                                doctor_list =  DoctorInfo.query.all() ,
-                               appointments = AppointmentInfo.query.filter_by( patient_id = user.patient.id ,  ).all()
+                               appointments = aux
                                 )
 
 @app.route('/edit_account')
@@ -792,6 +804,8 @@ def confirm_appointments():
         pending_appointments = AppointmentInfo.query.filter_by(
         doctor_id = user.doctor.id ,
         confirmation = 0 ).all()  # appointments not accepted / rejected yet
+
+        check_appointment_confirmation(pending_appointments)
 
         for ap in pending_appointments:
                 appointment_response = request.form.get(f"confirmation_{ap.id}")
