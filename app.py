@@ -300,7 +300,7 @@ def load_doctor_appointments_page():
         aux = AppointmentInfo.query.filter_by(
                                         doctor_id = user.doctor.id ,
                                         confirmation = 1 ,
-                                        status = "upcoming" ).all()
+                                        ).all()
         
         check_appointment_confirmation(aux)
 
