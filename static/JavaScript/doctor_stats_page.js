@@ -68,7 +68,7 @@ function buildDiagnosticChart(filtered) {
             }
         ],
         {
-            title: "Number of diagnostics",
+            title: "Most common diagnostics",
             yaxis: {
                 dtick: 1
             }
